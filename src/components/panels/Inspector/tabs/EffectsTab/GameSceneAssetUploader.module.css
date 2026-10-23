@@ -1,0 +1,99 @@
+.container {
+  margin-top: 8px;
+}
+
+.label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.grid {
+  display: flex;
+  gap: 6px;
+}
+
+.card {
+  flex: 1;
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.card:hover {
+  border-color: var(--accent-main);
+}
+
+.card:hover .overlay {
+  opacity: 1;
+}
+
+.preview {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-surface, #1a1a1a);
+}
+
+.previewBg {
+  aspect-ratio: 16 / 9;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.overlayIcon {
+  font-size: 14px;
+  color: #fff;
+}
+
+.slotLabel {
+  font-size: 9px;
+  text-align: center;
+  padding: 2px 0 3px;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resetBtn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.card:hover .resetBtn {
+  opacity: 1;
+}

@@ -1,0 +1,226 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.previewWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: repeating-conic-gradient(var(--bg-panel) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.channelsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.passTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.passTabBuf {
+  display: inline-flex;
+  align-items: center;
+}
+
+.passTab {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.passTabActive {
+  background: var(--accent, #e0245e);
+  color: #fff;
+  border-color: var(--accent, #e0245e);
+}
+
+.passTabOff {
+  opacity: 0.55;
+}
+
+.passTabClose {
+  font-size: 10px;
+  margin-left: 2px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.channelCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--bg-panel);
+}
+
+.cubemapGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.cubemapFace {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+}
+
+.channelHint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.channelHint code {
+  font-family: var(--font-mono, monospace);
+  background: var(--bg-elevated, rgba(127, 127, 127, 0.15));
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+.previewCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.previewBadge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.sourceLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.source {
+  width: 100%;
+  min-height: 160px;
+  resize: vertical;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  line-height: 1.45;
+  tab-size: 2;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-input, var(--bg-panel));
+  color: var(--text-primary);
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+
+.source.hasError {
+  border-color: #e0555b;
+}
+
+.errorLog {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 11px;
+  line-height: 1.4;
+  color: #ff9a9f;
+  background: rgba(224, 85, 91, 0.08);
+  border: 1px solid rgba(224, 85, 91, 0.35);
+  border-radius: 6px;
+  padding: 6px 8px;
+  white-space: pre-wrap;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.okLog {
+  font-size: 11px;
+  color: #6ad19a;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rowLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 64px;
+}
+
+.slider {
+  flex: 1;
+}
+
+.blendGroup {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-panel);
+  border-radius: 6px;
+  padding: 2px;
+  flex-wrap: wrap;
+}
+
+.blendBtn {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.blendBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.blendBtnActive {
+  color: #ff8b8f;
+  background: rgba(224, 85, 91, 0.18);
+}

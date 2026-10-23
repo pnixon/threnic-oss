@@ -1,0 +1,15 @@
+# gitleaks configuration for Threnic
+# Uses the built-in default rules, plus a project allowlist.
+# Docs: https://github.com/gitleaks/gitleaks
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Project-level false positives (redacted placeholders and env-var references, not live secrets)"
+
+# Files that reference secret VARIABLE NAMES (documentation / examples) but
+# contain no live values. Real secrets must live only in gitignored .env files.
+paths = [
+  '''\.env\.example''',
+]

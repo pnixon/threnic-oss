@@ -1,0 +1,101 @@
+{
+  "name": "threnic",
+  "version": "0.11.0",
+  "author": "NXN Technologies LLC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pnixon/threnic-oss.git"
+  },
+  "homepage": "https://github.com/pnixon/threnic-oss",
+  "bugs": "https://github.com/pnixon/threnic-oss/issues",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "npm run check-format && next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "check-format": "prettier --check .",
+    "test": "node scripts/test-report.mjs",
+    "test:quick": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "validate:milkdrop": "node scripts/validate-milkdrop-wgsl.mjs",
+    "prepare": "husky",
+    "docker:verify": "node scripts/verify-docker-build.mjs"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "browser": {
+    "fs": false,
+    "path": false
+  },
+  "overrides": {
+    "three": "^0.182.0",
+    "protobufjs": "^7.6.5",
+    "tar": "^7.5.21",
+    "nanoid": "^3.3.18",
+    "websocket-driver": "^0.7.5",
+    "fflate": "^0.8.3",
+    "baseline-browser-mapping": "^2.11.0",
+    "@protobufjs/utf8": "^1.1.1",
+    "js-cookie": "^3.0.8",
+    "fast-xml-builder": "^1.2.0",
+    "lodash": "^4.18.1"
+  },
+  "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.7.7",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.1.0",
+    "@heroicons/react": "^2.2.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.2",
+    "butterchurn": "2.6.7",
+    "butterchurn-presets": "2.4.7",
+    "idb": "^8.0.3",
+    "lucide-react": "^0.562.0",
+    "mediabunny": "^1.29.1",
+    "mp4box": "^2.3.0",
+    "next": "16.3.5",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "three": "^0.182.0",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.6",
+    "@playwright/test": "^1.57.0",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^20",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.0.17",
+    "esbuild": "^0.27.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "eslint-config-prettier": "^10.1.8",
+    "happy-dom": "^20.4.0",
+    "husky": "^9.1.7",
+    "jsdom": "^27.4.0",
+    "jszip": "^3.10.1",
+    "lint-staged": "^16.2.7",
+    "playwright": "^1.59.1",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
+  }
+}

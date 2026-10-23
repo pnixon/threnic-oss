@@ -1,0 +1,321 @@
+/* Tracks.module.css — Compact DAW-inspired lyrics track styles */
+
+/* ═══════════════════════════════════════════════════════════════
+   1. TRACK CONTAINERS
+   ═══════════════════════════════════════════════════════════════ */
+
+.lyricsTrackContainer {
+  background: var(--bg-input);
+  border-radius: 2px;
+  /* Ghost border — felt, not seen */
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.04));
+}
+
+.lyricsTrackContent {
+  position: relative;
+  height: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2. WORD BLOCKS (Compact Chips)
+   ═══════════════════════════════════════════════════════════════ */
+
+.wordBlock {
+  position: absolute;
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  box-sizing: border-box;
+  z-index: 10;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
+}
+
+.wordBlock:hover {
+  background: var(--border-subtle, rgba(255, 255, 255, 0.1));
+  border-color: var(--border-hover, rgba(255, 255, 255, 0.18));
+  z-index: 20;
+}
+
+.wordBlock.dragging {
+  cursor: grabbing;
+  background: var(--accent-muted);
+  border-color: var(--accent-main);
+  z-index: 30;
+}
+
+.wordBlock.selectedWord {
+  border-color: var(--accent-main);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.wordText {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-primary, rgba(255, 255, 255, 0.85));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.wordInput {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-app);
+  border: none;
+  color: var(--text-primary);
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  border-radius: 2px;
+  outline: 1px solid var(--crucible-red);
+  padding: 0;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3. RESIZE HANDLES
+   ═══════════════════════════════════════════════════════════════ */
+
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 40;
+}
+
+.resizeHandleLeft {
+  left: 0;
+}
+
+.resizeHandleRight {
+  right: 0;
+}
+
+.resizeHandle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   4. LINE GROUP ELEMENTS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* The subtle background band behind words of the same line */
+.lineBox {
+  position: absolute;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: grab;
+  background: rgba(255, 255, 255, 0.012);
+  touch-action: none;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.lineBox:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lineBoxDragging {
+  cursor: grabbing;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+/* Grip dots in center of line box */
+.lineGrip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.lineGripDot {
+  width: 12px;
+  height: 1.5px;
+  background: white;
+  border-radius: 1px;
+}
+
+/* Line start/end handles */
+.lineHandle {
+  position: absolute;
+  width: 10px;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lineHandleBar {
+  width: 3px;
+  border-radius: 1.5px;
+}
+
+.lineHandleStart .lineHandleBar {
+  height: 70%;
+  background: var(--crucible-red);
+  box-shadow: 0 0 6px var(--crucible-red-glow);
+}
+
+.lineHandleEnd .lineHandleBar {
+  height: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  opacity: 0.8;
+}
+
+.lineHandle:hover .lineHandleBar {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   5. LANE CONTROLS (top-right corner)
+   ═══════════════════════════════════════════════════════════════ */
+
+.laneControls {
+  position: absolute;
+  top: 18px;
+  right: 4px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  user-select: none;
+  font-family: Inter, system-ui, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.laneBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 9px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.laneBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.laneCount {
+  min-width: 10px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   6. LANE DIVIDERS
+   ═══════════════════════════════════════════════════════════════ */
+
+.laneDivider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.laneDivider:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.laneNumber {
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.15);
+  font-family: monospace;
+  user-select: none;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   7. CONTEXT MENU
+   ═══════════════════════════════════════════════════════════════ */
+
+.contextMenu {
+  position: fixed;
+  background: var(--bg-app);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  min-width: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  z-index: 2000;
+  backdrop-filter: blur(16px);
+}
+
+.contextMenuBtn {
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 5px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.1s;
+}
+
+.contextMenuBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 2px 0;
+}
+
+/* Lane selector in context menu */
+.laneSelector {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.laneSelectorLabel {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-right: 2px;
+}

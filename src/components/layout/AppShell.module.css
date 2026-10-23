@@ -1,0 +1,838 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  width: 100vw;
+  width: 100dvw;
+  overflow: hidden;
+  background-color: var(--bg-app);
+}
+
+/* Exportable class placeholders for CSS modules dynamic classes */
+.isMobile {
+}
+.view-stage {
+}
+.view-playlist {
+}
+.view-studio {
+}
+.bottomCollapsed {
+}
+.bottomExpanded {
+}
+.mobileStageMini {
+}
+.mobileTimelineFull {
+}
+
+/* Mobile drawer dismiss backdrop — covers the area above an open Playlist/
+   Studio drawer (which sit at z-index 120). Tapping it returns to Stage. */
+.mobileDrawerBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--mobile-drawer-height, 48vh) + var(--nav-bar-height));
+  z-index: 110;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  animation: mobileBackdropFadeIn var(--duration-normal) ease;
+}
+
+@keyframes mobileBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Header */
+.header {
+  height: var(--header-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  position: relative;
+  z-index: 200;
+}
+
+/* Main content area */
+.main {
+  flex: 1;
+  display: block;
+  /* Changed from flex to block for absolute positioning context */
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+/* Layer 0: Center Canvas (Background) */
+.centerStage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  /* Remove padding to allow full bleed */
+  padding: 0;
+}
+
+/* Layer 1: Panels Overlay */
+.panelsLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  /* Let clicks pass through empty spaces */
+}
+
+/* Side Panels */
+/* Side Panels */
+.leftPanel,
+.rightPanel {
+  position: relative;
+  flex-shrink: 0;
+  transition: width var(--duration-slow) var(--ease-out-expo);
+  pointer-events: auto;
+  /* Re-enable pointer events */
+  height: 100%;
+  background: var(--glass-bg);
+  /* Ensure panels have background */
+  z-index: 5;
+}
+
+.leftPanel {
+  width: var(--left-panel-width);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.rightPanel {
+  width: var(--right-panel-width);
+  border-left: 1px solid var(--border-subtle);
+}
+
+.leftPanel.collapsed {
+  width: 0;
+  /* Ensure border doesn't show when collapsed */
+  border-right: none;
+}
+
+.rightPanel.collapsed {
+  width: 0;
+  border-left: none;
+}
+
+.panelContent {
+  width: var(--left-panel-width);
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: transparent;
+  opacity: 1;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.rightPanel .panelContent {
+  width: var(--right-panel-width);
+}
+
+.leftPanel.collapsed .panelContent,
+.rightPanel.collapsed .panelContent {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Panel collapse handle */
+.panelHandle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 48px;
+  background: var(--bg-hover);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all var(--duration-fast) ease;
+  z-index: 10;
+}
+
+/* Adjusted handle positioning to ensure they remain reachable */
+.leftPanel .panelHandle {
+  right: -12px;
+  /* Slight overlap to ensure clickability */
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.rightPanel .panelHandle {
+  left: -12px;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+/* Panel Resizer */
+.rightResizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px; /* Extend hit area slightly out */
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 20;
+}
+
+.rightResizer:hover {
+  background: var(--border-hover);
+}
+
+/* Timeline Resizer */
+.timelineResizer {
+  position: absolute;
+  top: -4px; /* Hit area extends slightly above border */
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+  z-index: 20;
+}
+
+.timelineResizer:hover {
+  background: var(--border-hover);
+}
+
+.isResizing {
+  user-select: none;
+}
+.isResizing :global(*) {
+  pointer-events: none; /* Prevent iframes/videos from eating mouse events during resize */
+}
+
+/* More prominent handles when collapsed - increased specificity */
+.shell .leftPanel.collapsed .panelHandle,
+.shell .rightPanel.collapsed .panelHandle {
+  width: 64px;
+  /* Doubled from previous 32px */
+  background: var(--accent-muted);
+  font-family: var(--font-mono);
+  box-shadow: 0 0 15px var(--accent-glow);
+  color: var(--accent-main);
+  border: 1px solid var(--accent-glow);
+  color: white;
+}
+
+.shell .leftPanel.collapsed .panelHandle:hover,
+.shell .rightPanel.collapsed .panelHandle:hover {
+  background: var(--accent-muted);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.panelHandle:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.panelHandle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--border-active);
+}
+
+/* Timeline */
+.timeline {
+  height: var(--timeline-height);
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-subtle);
+  padding: 0;
+  position: relative;
+  transition:
+    height var(--duration-slow) var(--ease-out-expo),
+    padding var(--duration-slow) var(--ease-out-expo);
+}
+
+.timeline.collapsed {
+  height: 12px;
+  /* Visible sliver */
+  padding: 0;
+  /* overflow: hidden; REMOVED to allow handle to float outside */
+  border-top: 1px solid transparent;
+  /* Hide border to look cleaner */
+}
+
+.timelineHandle {
+  position: absolute;
+  top: -12px;
+  /* Sit on top of the timeline */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 16px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all var(--duration-fast) ease;
+  z-index: 10;
+}
+
+/* More prominent timeline handle when collapsed */
+.timeline.collapsed .timelineHandle {
+  height: 48px;
+  /* Doubled from previous 24px */
+  top: -48px;
+  /* Move up to match new height */
+  background: var(--bg-hover);
+  box-shadow: 0 -5px 10px var(--accent-glow);
+  border-color: var(--border-subtle);
+}
+
+.timeline.collapsed .timelineHandle:hover {
+  background: var(--bg-hover);
+  box-shadow: 0 -5px 15px var(--accent-glow);
+}
+
+.timelineHandle:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.timelineHandle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--border-active);
+}
+
+.timelineContent {
+  opacity: 1;
+  transition: opacity var(--duration-fast) ease;
+  height: 100%;
+}
+
+.timeline.collapsed .timelineContent {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Overlays Layer - "Safe Zone" for UI elements that should avoid panels */
+.overlaysLayer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* Left and Right are set dynamically in JS or via modifier classes */
+  left: 0;
+  right: 0;
+  z-index: 100;
+  pointer-events: none;
+  transition:
+    left var(--duration-slow) var(--ease-out-expo),
+    right var(--duration-slow) var(--ease-out-expo);
+}
+
+/* We can also use classes if we want, but inline styles for dynamic width might be easier if width is variable. 
+   However, assuming fixed 320px for now, we can use classes. */
+.overlaysLayer.withLeftPanel {
+  left: var(--left-panel-width);
+}
+
+.overlaysLayer.withRightPanel {
+  right: var(--right-panel-width);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .header {
+    padding: 0 var(--space-4);
+  }
+
+  .timeline {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .panelHandle {
+    width: 14px;
+    height: 40px;
+  }
+
+  .timelineHandle {
+    width: 40px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .header {
+    padding: 0 var(--space-3);
+  }
+
+  .timeline {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .panelHandle {
+    width: 12px;
+    height: 36px;
+  }
+
+  .shell .leftPanel.collapsed .panelHandle,
+  .shell .rightPanel.collapsed .panelHandle {
+    width: 56px;
+    font-size: 10px;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .timeline.collapsed .timelineHandle {
+    height: 36px;
+    top: -36px;
+  }
+}
+
+@media (max-width: 900px) {
+  .timeline {
+    padding: var(--space-2);
+  }
+
+  .panelHandle {
+    width: 10px;
+    height: 32px;
+  }
+
+  .shell .leftPanel.collapsed .panelHandle,
+  .shell .rightPanel.collapsed .panelHandle {
+    width: 72px;
+    height: 48px;
+    font-size: 10px;
+    box-shadow: 0 0 18px var(--accent-glow);
+    border: 1px solid var(--accent-glow);
+  }
+
+  .timelineHandle {
+    width: 36px;
+    height: 12px;
+    top: -10px;
+  }
+}
+
+.shell.isMobile {
+  --nav-bar-height: calc(56px + env(safe-area-inset-bottom, 0px));
+  /* Resting drawer height. Bumped to a tall sheet when a Playlist/Studio
+     drawer is actually open (see .view-playlist / .view-studio below) so the
+     tabbed Studio content (Lyrics/Effects/Export + accordions) has room. */
+  --mobile-drawer-height: 48vh;
+}
+
+/* When a bottom drawer is open, give it a tall sheet that runs from just
+   below the header to the top of the nav bar, leaving a small canvas peek at
+   the top (the dimmed backdrop there stays tappable to dismiss). The canvas is
+   hidden behind the backdrop while a drawer is open, so it needs no room. */
+.shell.isMobile.view-playlist,
+.shell.isMobile.view-studio {
+  --mobile-drawer-height: calc(100vh - var(--header-height) - var(--nav-bar-height) - 6vh);
+}
+
+.shell.isMobile .timeline,
+.shell.isMobile .timeline.collapsed {
+  position: fixed;
+  bottom: var(--nav-bar-height) !important;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  padding: var(--space-3) var(--space-4) !important;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  height: 48vh !important;
+  transition: height var(--duration-normal) var(--ease-out-expo);
+}
+
+.shell.isMobile .timeline.collapsed .timelineHandle {
+  display: none !important;
+}
+
+.shell.isMobile .timeline.mobileExpanded {
+  height: calc(100vh - var(--header-height) - var(--nav-bar-height)) !important;
+  bottom: var(--nav-bar-height) !important;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  padding: var(--space-4) !important;
+  z-index: 200;
+}
+
+.shell.isMobile .timelineHandle {
+  display: none !important;
+}
+
+/* ── Mobile Stage: compact player bar (default) ──
+   The timeline slot holds the small MobilePlayerBar; size it to its content
+   and let the canvas take the rest of the viewport. */
+.shell.isMobile.mobileStageMini .timeline,
+.shell.isMobile.mobileStageMini .timeline.collapsed {
+  height: auto !important;
+  bottom: var(--nav-bar-height) !important;
+  padding: 0 !important;
+}
+
+.shell.isMobile.mobileStageMini .timelineContent {
+  height: auto;
+}
+
+/* Canvas fills from header down to the top of the compact player bar.
+   The bar is ~120px tall incl. safe-area; reserve room + nav bar. */
+.shell.isMobile.mobileStageMini .centerStage,
+.shell.isMobile.mobileStageMini.view-stage .centerStage {
+  top: 0;
+  bottom: calc(var(--nav-bar-height) + 120px) !important;
+  height: auto;
+}
+
+/* ── Mobile Stage: full detailed timeline sheet (expanded) ──
+   Tall sheet for power editing (ruler + lanes). */
+.shell.isMobile.mobileTimelineFull .timeline {
+  height: 60vh !important;
+  bottom: var(--nav-bar-height) !important;
+  z-index: 200;
+}
+
+.shell.isMobile.mobileTimelineFull .timelineContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.shell.isMobile.mobileTimelineFull .centerStage {
+  bottom: calc(var(--nav-bar-height) + 60vh) !important;
+}
+
+/* Collapse button shown at the top of the expanded timeline sheet */
+:global(.mobileTimelineCollapseBtn) {
+  display: none;
+}
+
+.shell.isMobile.mobileTimelineFull :global(.mobileTimelineCollapseBtn) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 32px;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+}
+
+/* Mobile Layout (< 768px) */
+@media (max-width: 768px) {
+  .shell {
+    --nav-bar-height: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .header {
+    width: 100%;
+    z-index: 2100;
+  }
+
+  /* Panels become overlays on mobile */
+  .leftPanel {
+    position: fixed;
+    bottom: var(--nav-bar-height);
+    left: 0;
+    right: 0;
+    height: var(--mobile-drawer-height); /* Tall sheet when open (see :root vars) */
+    width: 100vw;
+    background: var(--glass-bg-heavy);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    z-index: 120;
+    border-radius: 12px 12px 0 0; /* Rounded top corners */
+    border-top: 1px solid var(--border-subtle);
+    border-right: none;
+    transform: translateY(100%); /* Slide down off-screen */
+    transition: transform var(--duration-normal) var(--ease-out-expo);
+  }
+
+  .rightPanel {
+    position: fixed;
+    bottom: var(--nav-bar-height);
+    left: 0;
+    right: 0;
+    height: var(--mobile-drawer-height); /* Tall sheet when open (see :root vars) */
+    width: 100vw;
+    background: var(--glass-bg-heavy);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    z-index: 120;
+    border-radius: 12px 12px 0 0; /* Rounded top corners */
+    border-top: 1px solid var(--border-subtle);
+    border-left: none;
+    transform: translateY(100%); /* Slide down off-screen */
+    transition: transform var(--duration-normal) var(--ease-out-expo);
+  }
+
+  /* Hide default handles on mobile */
+  .panelHandle {
+    display: none;
+  }
+
+  /* Active states (toggled by class) */
+  .leftPanel.mobileActive {
+    transform: translateY(0);
+  }
+
+  .rightPanel.mobileActive {
+    transform: translateY(0); /* Slide up to active */
+  }
+
+  /* Backstop: on mobile, panel visibility is driven by .mobileActive only.
+     Never honor the desktop .collapsed state here (it sets width:0 /
+     visibility:hidden), or an auto-collapsed panel would open as an empty sheet. */
+  .leftPanel.collapsed,
+  .rightPanel.collapsed {
+    width: 100vw;
+  }
+
+  .leftPanel.collapsed .panelContent,
+  .rightPanel.collapsed .panelContent {
+    width: 100%;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Panel content takes full width */
+  .panelContent {
+    width: 100%;
+  }
+
+  .leftPanel .panelContent,
+  .rightPanel .panelContent {
+    width: 100%;
+  }
+
+  /* Timeline is always expanded showing lanes on mobile */
+  .timeline,
+  .timeline.collapsed {
+    position: fixed;
+    bottom: var(--nav-bar-height);
+    left: 0;
+    right: 0;
+    z-index: 90;
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    height: 48vh;
+    transition: height var(--duration-normal) var(--ease-out-expo);
+  }
+
+  /* Override the desktop collapsed handle style for mobile */
+  .timeline.collapsed .timelineHandle {
+    display: none !important;
+  }
+
+  /* When expanded class is applied (we need to change React logic to match) */
+  .timeline.mobileExpanded {
+    height: calc(100vh - var(--header-height) - var(--nav-bar-height)) !important;
+    bottom: var(--nav-bar-height) !important;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    padding: var(--space-4);
+    z-index: 200;
+  }
+
+  .timelineHandle {
+    display: none !important;
+  }
+
+  /* Ensure content is visible in mini player */
+  .timelineContent,
+  .timeline.collapsed .timelineContent {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    height: 100%;
+  }
+
+  .mobileHidden {
+    display: none !important;
+  }
+
+  .isExporting {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-top: none !important;
+    pointer-events: none; /* Let clicks pass through to canvas when panning */
+  }
+
+  .isExporting > :global(*) {
+    pointer-events: auto; /* Re-enable for the widget card */
+  }
+
+  /* Auto-size Stage/Canvas to fit remaining viewport height above active drawers/menus */
+  .centerStage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--nav-bar-height) + 48vh);
+    height: auto;
+    width: 100%;
+    z-index: 0;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+
+  .shell.isMobile.view-stage.bottomCollapsed .centerStage,
+  .shell.isMobile.view-stage.bottomExpanded .centerStage {
+    top: 0;
+    bottom: calc(var(--nav-bar-height) + 48vh);
+    height: auto;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .shell.isMobile.view-playlist .centerStage,
+  .shell.isMobile.view-studio .centerStage {
+    top: 0;
+    bottom: calc(var(--mobile-drawer-height, 48vh) + var(--nav-bar-height));
+    height: auto;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.unsupportedOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050508;
+  padding: 24px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.unsupportedCard {
+  background: rgba(10, 10, 12, 0.7);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.15);
+  border-radius: 8px;
+  max-width: 280px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-primary);
+}
+
+.warningHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.warningIcon {
+  color: var(--crucible-red, #ef4444);
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+}
+
+.warningTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.warningText {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  text-align: center;
+  margin: 0;
+}
+
+.specsContainer {
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.specRowHeader {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+}
+
+.specRow {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.specRow:last-child {
+  border-bottom: none;
+}
+
+.specError {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
+  font-weight: 600;
+}
+
+.warningFooter {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}

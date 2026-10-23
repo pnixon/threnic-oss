@@ -1,0 +1,174 @@
+/* TrackSidebar.module.css — DAW track header sidebar */
+
+.sidebar {
+  width: 212px;
+  min-width: 212px;
+  flex: none;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+  display: grid;
+  grid-template-rows: 34px 1.2fr 1fr 0.7fr 1.5fr;
+  z-index: 3;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* Top header row (aligns with ruler) */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.headerLabel {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Track rows - grid-placed to match track lanes exactly */
+.trackRow {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px 0 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trackRowLyrics {
+}
+
+.trackRowBackground {
+}
+
+.trackRowEffects {
+}
+
+.trackRowAudio {
+}
+
+.trackInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trackIndicator {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.trackName {
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.trackMeta {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', var(--font-mono, monospace), monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+/* Lane count controls */
+.laneControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.laneLabel {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.laneBtn {
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  border: 1px solid var(--border-hover);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.12s;
+}
+
+.laneBtn:hover {
+  background: var(--border-hover);
+}
+
+.laneCount {
+  min-width: 9px;
+  text-align: center;
+  font-family: 'IBM Plex Mono', var(--font-mono, monospace), monospace;
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+/* Spectrum layer chips */
+.layerChips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.layerChip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 4px;
+  border-radius: 5px;
+  cursor: pointer;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', var(--font-mono, monospace), monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.12s;
+}
+
+.layerChip:hover {
+  filter: brightness(1.35);
+}
+
+.layerChipActive {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.layerSwatch {
+  width: 8px;
+  border-radius: 2px;
+  background: var(--crucible-red, #ef4a3a);
+  flex: none;
+}
+
+/* Bottom spacer removed - grid handles sizing */
+.spacer {
+  display: none;
+}

@@ -1,0 +1,15 @@
+# Secret scan: block commits that introduce credentials.
+# Skips (with a warning) when gitleaks isn't installed so contributors
+# without it aren't blocked; install from https://github.com/gitleaks/gitleaks
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --verbose || {
+    echo "";
+    echo "gitleaks detected a potential secret in your staged changes (see above).";
+    echo "Remove the secret or, if it is a false positive, add a rule/allowlist to .gitleaks.toml.";
+    exit 1;
+  }
+else
+  echo "warning: gitleaks not found on PATH - skipping secret scan. Install it: https://github.com/gitleaks/gitleaks";
+fi
+
+npx lint-staged

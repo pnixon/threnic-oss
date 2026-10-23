@@ -1,0 +1,522 @@
+/* Timeline.module.css — DAW-style split-panel layout */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─── Toolbar ─── */
+.toolbar {
+  height: 60px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.toolbarCenter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Time Pill */
+.timePill {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeMain {
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.timeSeparator {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.timeTotal {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+/* Status dot */
+.statusGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.statusDot[data-state='paused'] {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.statusLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Transport */
+.transportBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.transportBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.playBtn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--crucible-red) 0%, #dc2626 100%);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.playBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px var(--crucible-red-glow);
+}
+
+/* Volume */
+.volumeGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.muteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.muteBtn:hover {
+  color: var(--text-primary);
+}
+
+.muteBtn[data-muted='true'] {
+  color: var(--crucible-red);
+}
+
+.volumeSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 84px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border-hover);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.volumeSlider:hover {
+  background: var(--text-muted);
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--crucible-red);
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.volumeSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px var(--crucible-red-glow);
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--crucible-red);
+  border: none;
+  cursor: pointer;
+}
+
+/* Zoom pill */
+.zoomGroup {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.zoomBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.zoomBtn:hover {
+  background: var(--border-subtle);
+  color: white;
+}
+
+.zoomLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 0 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  min-width: 32px;
+  text-align: center;
+}
+
+/* Speed pill */
+.speedGroup {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.speedBtn {
+  padding: 5px 8px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.speedBtn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.speedBtn[data-active='true'] {
+  color: var(--crucible-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.speedCycleBtn {
+  display: none;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0;
+}
+
+/* ─── Body Row ─── */
+.bodyRow {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ─── Scroll Area ─── */
+.scrollArea {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  background: var(--bg-input, #0a0a0d);
+  display: grid;
+  grid-template-rows: 34px 1.2fr 1fr 0.7fr 1.5fr;
+}
+
+/* ─── Ruler ─── */
+.ruler {
+  background: var(--bg-app);
+  border-bottom: 1px solid var(--bg-hover);
+  position: relative;
+}
+
+/* ─── Track Lanes ─── */
+.trackLane {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid var(--bg-hover);
+  min-height: 0;
+}
+
+.trackLane:last-child {
+  border-bottom: none;
+}
+
+.lyricsLane {
+}
+
+.backgroundLane {
+}
+
+.effectsLane {
+}
+
+.audioLane {
+}
+
+/* ─── Playhead ─── */
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--crucible-red);
+  pointer-events: none;
+  z-index: 4;
+  box-shadow: 0 0 4px var(--crucible-red-glow);
+}
+
+.playheadDiamond {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  background: var(--crucible-red);
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* ─── Legacy compat classes (keep for tests) ─── */
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tracksViewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.trackWidget {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.trackHeader {
+  display: none;
+}
+
+.trackLabel {
+  display: none;
+}
+
+.exportBtn {
+  pointer-events: auto;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: 3px;
+  padding: 1px 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.exportBtn:hover {
+  background: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1400px) {
+  .speedGroup {
+    display: none;
+  }
+  .speedCycleBtn {
+    display: flex;
+  }
+}
+
+@media (max-width: 1150px) {
+  .statusGroup {
+    display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .volumeSlider {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  .zoomGroup {
+    display: none;
+  }
+  .speedCycleBtn {
+    display: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .toolbar {
+    height: auto;
+    min-height: 52px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .toolbarLeft {
+    order: 0;
+  }
+
+  .timePill {
+    padding: 4px 8px;
+  }
+
+  .timeMain {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .statusGroup {
+    display: none;
+  }
+
+  .toolbarCenter {
+    gap: 12px;
+  }
+
+  .transportBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .playBtn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .toolbarRight {
+    display: none;
+  }
+
+  .bodyRow {
+    flex-direction: column;
+  }
+
+  .scrollArea {
+    flex: 1;
+    min-height: 0;
+    grid-template-rows: 28px 1.2fr 1fr 0.7fr 1.5fr;
+  }
+
+  .playhead {
+    width: 2px;
+  }
+
+  .playheadDiamond {
+    width: 10px;
+    height: 10px;
+  }
+}

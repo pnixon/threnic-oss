@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check-format
+      - run: npx tsc --noEmit -p .
+      - run: npx vitest run
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    # Optional: a failing image build doesn't block the main check.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build .
+        env:
+          DOCKER_BUILDKIT: 1

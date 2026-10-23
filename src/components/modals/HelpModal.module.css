@@ -1,0 +1,514 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 5, 8, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; /* Above all other elements including player */
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+  isolation: isolate; /* Create new stacking context */
+}
+
+.modal {
+  background: rgba(10, 10, 12, 0.95);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 30px var(--crucible-red-muted);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 85vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  position: relative;
+  z-index: 1; /* Ensure modal is above overlay */
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.header h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tabActive {
+  color: var(--crucible-red);
+  border-bottom-color: var(--crucible-red);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  color: #e5e7eb;
+}
+
+.intro {
+  margin-bottom: 32px;
+}
+
+.title {
+  margin: 0 0 16px 0;
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #991b1b, var(--crucible-red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.description {
+  margin: 0;
+  line-height: 1.6;
+  color: #d1d5db;
+  font-size: 15px;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sectionText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d1d5db;
+}
+
+.flowDiagram {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.flowStep {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #d1d5db;
+  white-space: nowrap;
+}
+
+.flowStepHighlight {
+  padding: 8px 16px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fca5a1;
+  white-space: nowrap;
+}
+
+.flowArrow {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.workflowSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s;
+}
+
+.step:hover {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.stepIcon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(153, 27, 27, 0.2));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--crucible-red);
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepTitle {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.stepText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d1d5db;
+}
+
+.stepText strong {
+  color: #22d3ee;
+  font-weight: 600;
+}
+
+.tipsList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tip {
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.05);
+  border-left: 3px solid var(--crucible-red);
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d1d5db;
+}
+
+.tip strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.shortcutList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  gap: 16px;
+}
+
+.shortcutKey {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crucible-red);
+  padding: 6px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.shortcutDesc {
+  flex: 1;
+  font-size: 13px;
+  color: #d1d5db;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .overlay {
+    padding: 0;
+    background: rgb(15, 11, 21); /* Fully opaque on mobile */
+    backdrop-filter: none; /* Remove blur to prevent performance issues */
+  }
+
+  .modal {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+    background: rgb(15, 11, 21); /* Fully opaque */
+    will-change: transform; /* Optimize for animation */
+  }
+
+  .header {
+    padding: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgb(15, 11, 21); /* Fully opaque */
+    backdrop-filter: none;
+  }
+
+  .header h2 {
+    font-size: 16px;
+  }
+
+  .tabs {
+    position: sticky;
+    top: 52px; /* Below header */
+    z-index: 10;
+    background: rgb(15, 11, 21); /* Fully opaque */
+    backdrop-filter: none;
+  }
+
+  .tab {
+    padding: 14px 12px;
+    font-size: 12px;
+  }
+
+  .content {
+    padding: 16px;
+    padding-bottom: 32px; /* Extra bottom padding for comfort */
+  }
+
+  .title {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .description {
+    font-size: 14px;
+  }
+
+  .section {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .sectionTitle {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .sectionText {
+    font-size: 13px;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .stepIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .stepTitle {
+    font-size: 14px;
+  }
+
+  .stepText {
+    font-size: 12px;
+  }
+
+  .tip {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .shortcut {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .shortcutKey {
+    font-size: 12px;
+  }
+
+  .shortcutDesc {
+    font-size: 12px;
+  }
+
+  .flowDiagram {
+    font-size: 11px;
+    gap: 8px;
+    padding: 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .flowArrow {
+    font-size: 0; /* Hide original arrow */
+    text-align: center;
+    width: 100%;
+    margin: 4px 0;
+  }
+
+  .flowArrow::after {
+    content: '↓';
+    font-size: 16px; /* Restore visible size */
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .flowStep,
+  .flowStepHighlight {
+    width: 100%;
+    text-align: center;
+  }
+
+  .flowStep,
+  .flowStepHighlight {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+.feedbackLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: #24292f;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.feedbackLink:hover {
+  background: #32383f;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.feedbackLink:active {
+  transform: translateY(0);
+}
+
+.inlineCode {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.85em;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #22d3ee;
+  padding: 2px 6px;
+  border-radius: 4px;
+  word-break: break-word;
+}

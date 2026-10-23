@@ -1,0 +1,118 @@
+/* ButterchurnPresetSelect — matches Inspector panel styling */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, rgba(255, 255, 255, 0.35));
+}
+
+.searchInput {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border, rgba(226, 224, 251, 0.08));
+  background: var(--bg-input, rgba(0, 0, 0, 0.4));
+  color: var(--text-primary, #e2e0fb);
+  font-size: 11px;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted, rgba(255, 255, 255, 0.35));
+}
+
+.searchInput:hover {
+  border-color: var(--accent-main, #ef4444);
+}
+
+.searchInput:focus {
+  border-color: var(--accent-main, #ef4444);
+  box-shadow: 0 0 0 1px var(--accent-main, #ef4444);
+}
+
+.listbox {
+  border-radius: 4px;
+  border: 1px solid var(--border, rgba(226, 224, 251, 0.08));
+  background: var(--bg-input, rgba(0, 0, 0, 0.4));
+  max-height: 160px;
+  overflow-y: auto;
+  outline: none;
+}
+
+.listbox:focus-within {
+  border-color: var(--accent-main, #ef4444);
+}
+
+.option {
+  padding: 5px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-secondary, rgba(226, 224, 251, 0.7));
+  border-radius: 2px;
+  transition:
+    background 0.1s,
+    color 0.1s;
+}
+
+.option:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+  color: var(--text-primary, #e2e0fb);
+}
+
+.optionSelected {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-main, #ef4444);
+  font-weight: 600;
+}
+
+.optionSelected:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-main, #ef4444);
+}
+
+.count {
+  font-size: 10px;
+  color: var(--text-muted, rgba(255, 255, 255, 0.35));
+}
+
+.loading {
+  font-size: 11px;
+  color: var(--text-muted, rgba(255, 255, 255, 0.35));
+  padding: 4px 0;
+}
+
+.attribution {
+  font-size: 9px;
+  line-height: 1.4;
+  margin: 4px 0 0;
+  color: var(--text-muted, rgba(255, 255, 255, 0.35));
+}
+
+.attribution code {
+  font-size: 9px;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-secondary, rgba(226, 224, 251, 0.7));
+}
+
+.attribution a {
+  color: var(--accent-main, #ef4444);
+  text-decoration: none;
+}
+
+.attribution a:hover {
+  text-decoration: underline;
+}

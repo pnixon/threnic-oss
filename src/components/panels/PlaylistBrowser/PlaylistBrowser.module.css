@@ -1,0 +1,768 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* No horizontal padding so track items span the full panel width;
+     keep vertical padding for top/bottom breathing room. */
+  padding: var(--space-3) 0;
+}
+
+/* Re-inset only the header controls so they don't sit flush against the edge */
+.header {
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.addBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.addBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-hover);
+  color: var(--text-secondary);
+}
+
+.clearBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all var(--duration-fast) ease;
+  opacity: 0.6;
+}
+
+.clearBtn:hover {
+  color: #ef4444;
+  opacity: 1;
+}
+
+.clearBtn.confirmClear {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  opacity: 1;
+  padding-right: 8px;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}
+
+.clearText {
+  font-weight: 600;
+}
+
+.shuffleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  opacity: 0.6;
+}
+
+.shuffleBtn:hover {
+  color: var(--crucible-red);
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.shuffleBtn.active {
+  color: var(--crucible-red);
+  opacity: 1;
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 10px var(--crucible-red-muted);
+}
+
+.trackList {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.emptyIcon {
+  opacity: 0.3;
+}
+
+/* Track Item Container */
+.trackItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 8px;
+
+  /* Glassmorphic Look */
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid transparent;
+  border-top: 2px solid transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: all var(--duration-fast) ease;
+}
+
+.trackItem:active {
+  cursor: grabbing;
+}
+
+/* Dragging State */
+.draggingTrack {
+  opacity: 0.5;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Drop Target Indicator */
+.dropTarget {
+  border-top: 2px solid var(--crucible-red);
+  box-shadow: 0 -4px 12px var(--crucible-red-muted);
+}
+
+/* Bottom Drop Zone */
+.bottomDropZone {
+  height: 4px;
+  margin: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) ease;
+}
+
+.dropZoneActive {
+  height: 8px;
+  background: linear-gradient(90deg, transparent, var(--crucible-red), transparent);
+  box-shadow: 0 0 12px var(--crucible-red-glow);
+}
+
+.trackItem:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.trackItem.selected {
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.1) 0%, rgba(127, 29, 29, 0.05) 100%);
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 12px var(--crucible-red-muted);
+}
+
+/* Metadata Container (Left Side: Icon + Time) */
+.trackMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.trackIcon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+.trackDuration {
+  font-size: 9px;
+  /* Smaller font for stacked time */
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  line-height: 1;
+}
+
+.trackItem.selected .trackIcon {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--crucible-red);
+}
+
+.trackInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  /* Tighter gap */
+}
+
+.trackName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Ensure it spans full width */
+  width: 100%;
+}
+
+.trackArtist {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* Action Buttons Overlay */
+/* Positioned absolute to not disrupt flow and show on hover */
+.trackActions {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  /* Pass through clicks when hidden */
+  transition: opacity var(--duration-fast) ease;
+  /* Add background/blur to ensure text readability behind buttons if overlap */
+  background: linear-gradient(to left, var(--glass-bg-heavy) 80%, transparent);
+  padding-left: 12px;
+  border-radius: var(--radius-sm);
+  height: 100%;
+}
+
+.trackItem:hover .trackActions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.moreBtn,
+.actionBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.moreBtn:hover,
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+}
+
+/* Drag and drop */
+.panel.dragging {
+  border: 2px dashed var(--crucible-red);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: rgba(5, 5, 8, 0.9);
+  color: var(--crucible-red);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 100;
+  border-radius: var(--radius-md);
+}
+
+/* Context Menu */
+
+/* Inline edit input */
+.editInput {
+  width: 100%;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-active);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+}
+
+/* Spinning animation */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Has lyrics indicator */
+.trackItem.selected .hasLyrics {
+  color: var(--crucible-red);
+}
+
+/* Playlist Settings Section */
+.settingsSection {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+}
+
+.settingsContent {
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  height: auto;
+  max-height: 400px;
+}
+
+.collapsed .settingsContent {
+  max-height: 0;
+  padding: 0 var(--space-2);
+  opacity: 0;
+}
+
+.settingItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settingLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.settingValue {
+  font-size: 11px;
+  color: var(--crucible-red);
+  font-weight: 600;
+}
+
+.checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--crucible-red);
+  cursor: pointer;
+}
+
+.range {
+  width: 100%;
+  height: 4px;
+  accent-color: var(--crucible-red);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.rangeLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--text-muted);
+  padding: 0 2px;
+}
+
+/* Audio Monitor Section */
+.monitorSection {
+  margin-top: auto;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+}
+
+.monitorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--duration-fast) ease;
+}
+
+.monitorHeader:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.collapseIcon {
+  transition: transform 0.3s ease;
+  transform: rotate(0deg);
+}
+
+.collapsed .collapseIcon {
+  transform: rotate(-90deg);
+}
+
+.monitorContent {
+  height: 100px;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.collapsed .monitorContent {
+  height: 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .panel {
+    padding: var(--space-2);
+  }
+
+  .header {
+    margin-bottom: var(--space-2);
+  }
+
+  .trackName {
+    font-size: 12px;
+  }
+
+  .trackArtist {
+    font-size: 10px;
+  }
+
+  .trackIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .trackMeta {
+    width: 28px;
+  }
+
+  .monitorContent {
+    height: 100px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .panel {
+    padding: var(--space-1);
+  }
+
+  .header {
+    margin-bottom: var(--space-1);
+  }
+
+  .addBtn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .trackItem {
+    padding: 4px 6px;
+    gap: var(--space-1);
+  }
+
+  .trackName {
+    font-size: 11px;
+  }
+
+  .trackArtist {
+    font-size: 9px;
+  }
+
+  .trackDuration {
+    font-size: 8px;
+  }
+
+  .trackIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .trackMeta {
+    width: 24px;
+  }
+
+  .moreBtn,
+  .actionBtn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .monitorHeader {
+    font-size: 11px;
+    padding: var(--space-1);
+  }
+
+  .monitorContent {
+    height: 80px;
+  }
+}
+
+@media (max-width: 900px) {
+  .panel {
+    padding: 4px;
+  }
+
+  .header {
+    margin-bottom: 2px;
+  }
+
+  .trackItem {
+    padding: 3px 5px;
+  }
+
+  .trackName {
+    font-size: 10px;
+  }
+
+  .trackArtist {
+    font-size: 8px;
+  }
+
+  .trackIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .trackMeta {
+    width: 20px;
+  }
+
+  .monitorContent {
+    height: 60px;
+  }
+}
+
+.helpBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px; /* rounded-full */
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.helpBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Mobile (< 768px) - Revert compression and optimize for touch */
+@media (max-width: 768px) {
+  /* ... existing styles ... */
+
+  .addBtn,
+  .helpBtn,
+  .shuffleBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px; /* Slightly larger radius for touch */
+    background: rgba(255, 255, 255, 0.05); /* Ensure visibility */
+  }
+
+  .clearBtn {
+    height: 44px;
+    padding: 0 16px; /* Larger hit area */
+    font-size: 13px; /* Readable text */
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .clearBtn.confirmClear {
+    background: rgba(239, 68, 68, 0.15); /* Slightly stronger for visibility on mobile */
+    padding: 0 16px;
+    width: auto;
+  }
+
+  .panel {
+    padding: var(--space-4);
+    padding-bottom: 100px; /* Extra padding for bottom visibility */
+    height: 100%;
+    /* Ensure scrollability within the fixed panel */
+    overflow-y: auto;
+    /* Space for bottom nav/mini player */
+  }
+
+  .trackItem {
+    padding: 12px;
+    min-height: 56px;
+    /* Larger touch target */
+    margin-bottom: 0;
+    background: rgba(255, 255, 255, 0.03);
+    /* More visible background */
+  }
+
+  .trackName {
+    font-size: 15px;
+    /* Readable size */
+    margin-bottom: 2px;
+  }
+
+  .trackArtist {
+    font-size: 13px;
+  }
+
+  .trackIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .trackMeta {
+    width: 36px;
+    margin-right: 12px;
+  }
+
+  .trackDuration {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  /* Always show actions on mobile or use a specific trigger */
+  .trackActions {
+    opacity: 1;
+    pointer-events: auto;
+    background: none;
+    /* Remove gradient cover */
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    padding-left: 0;
+  }
+
+  /* Only show the 'More' button or critical actions to save space? */
+  /* For now, let's keep them all but ensure they fit */
+
+  /* Removed duplicate addBtn selector here as it's grouped above */
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  /* Settings section larger targets */
+  .settingLabel {
+    padding: 12px 0;
+    font-size: 15px;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+  }
+
+  .range {
+    height: 8px;
+    /* Thicker slider */
+  }
+
+  .trackList {
+    overflow: visible; /* Let the panel handle scrolling */
+    flex: none; /* Allow it to grow */
+  }
+
+  .monitorSection {
+    margin-top: var(--space-4);
+    margin-bottom: 120px; /* Force spacing at bottom */
+    position: relative;
+    z-index: 5;
+  }
+
+  .monitorContent {
+    height: 120px;
+  }
+
+  /* Touch-friendly three-dot and action buttons */
+  .moreBtn,
+  .actionBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+  }
+
+  .moreBtn svg,
+  .actionBtn svg {
+    width: 20px;
+    height: 20px;
+  }
+}

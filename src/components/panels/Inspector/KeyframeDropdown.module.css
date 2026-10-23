@@ -1,0 +1,114 @@
+.container {
+  margin-bottom: var(--space-4, 16px);
+  padding: var(--space-3, 12px);
+  background: var(--bg-hover);
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(var(--glass-blur));
+  transition: all 0.2s ease;
+}
+
+.container:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-panel);
+}
+
+.label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2, 8px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.select {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px;
+}
+
+.select:hover {
+  border-color: var(--border-hover);
+  background-color: var(--bg-hover);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--accent-main);
+  box-shadow: 0 0 0 1px var(--accent-muted);
+}
+
+.select option {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  padding: 8px;
+}
+
+.hint {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.interpolationRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.subLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.smallSelect {
+  flex: 1;
+  background: var(--bg-input-subtle, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm, 4px);
+  color: var(--text-primary);
+  font-size: 10px;
+  padding: 4px 20px 4px 8px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 10px;
+  transition: all 0.2s;
+}
+
+.smallSelect:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.smallSelect option {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  padding: 8px;
+}

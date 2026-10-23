@@ -1,0 +1,394 @@
+/* ═══════════════════════════════════════════════════════════════
+ * Export Modal — "Crimson Obsidian" Design System
+ * Dramatic dark-red modal overlay for export progress feedback.
+ * Based on Stitch "Crimson Cinema" design specification.
+ * ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+/* ── Backdrop ───────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(10, 2, 2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Modal Card ─────────────────────────────────────────────── */
+.modal {
+  width: 520px;
+  max-width: 92vw;
+  background: #2a1010;
+  border-radius: 16px;
+  padding: 0;
+  box-shadow:
+    0 0 0 1px rgba(220, 20, 60, 0.15),
+    0 8px 40px rgba(220, 20, 60, 0.12),
+    0 24px 80px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px 14px;
+  background: #1f0e0e;
+  border-bottom: 1px solid rgba(220, 20, 60, 0.12);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerIcon {
+  font-size: 18px;
+  animation: pulse 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(220, 20, 60, 0.6));
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+  }
+}
+
+.headerTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #dc143c;
+  text-shadow: 0 0 12px rgba(220, 20, 60, 0.5);
+}
+
+.headerBadge {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(220, 20, 60, 0.12);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 20, 60, 0.2);
+}
+
+/* ── Body ───────────────────────────────────────────────────── */
+.body {
+  padding: 18px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Preview Frame ──────────────────────────────────────────── */
+.previewContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #1a0a0a;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(220, 20, 60, 0.2);
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(220, 20, 60, 0.06);
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.previewPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #5c3f3f;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+}
+
+.previewSpinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(220, 20, 60, 0.15);
+  border-top-color: #dc143c;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.previewFrameLabel {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 107, 107, 0.7);
+  background: rgba(10, 2, 2, 0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Progress Bar ───────────────────────────────────────────── */
+.progressBarTrack {
+  width: 100%;
+  height: 6px;
+  background: #1a0a0a;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #8b0000, #dc143c);
+  transition: width 0.3s ease-out;
+  position: relative;
+}
+
+.progressBarFill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  bottom: -3px;
+  width: 14px;
+  background: radial-gradient(circle at right, rgba(220, 20, 60, 0.9), transparent);
+  border-radius: 50%;
+  filter: blur(3px);
+}
+
+/* ── Stats Row ──────────────────────────────────────────────── */
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statsPrimary {
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffb3b3;
+  font-variant-numeric: tabular-nums;
+}
+
+.statsSecondary {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ff6b6b;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Meta Row (Elapsed + ETA + Phase) ───────────────────────── */
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metaLeft {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.elapsed {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff6b6b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.25);
+}
+
+.eta {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #8b3a3a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.etaIcon {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.phase {
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  color: #8b3a3a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.phaseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #dc143c;
+  animation: phasePulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes phasePulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 4px rgba(220, 20, 60, 0.6);
+  }
+  50% {
+    opacity: 0.4;
+    box-shadow: none;
+  }
+}
+
+/* ── Cancel Button ──────────────────────────────────────────── */
+.cancelBtn {
+  width: 100%;
+  padding: 12px 0;
+  margin-top: 2px;
+  border: 1px solid rgba(220, 20, 60, 0.25);
+  border-radius: 10px;
+  background: #3a1515;
+  color: #dc143c;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cancelBtn:hover {
+  background: #4a1a1a;
+  border-color: rgba(220, 20, 60, 0.5);
+  box-shadow: 0 0 16px rgba(220, 20, 60, 0.15);
+}
+
+.cancelBtn:active {
+  transform: scale(0.98);
+  background: #2a0f0f;
+}
+
+.cancelIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ── Complete State ─────────────────────────────────────────── */
+.completeOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(26, 10, 10, 0.88);
+  backdrop-filter: blur(4px);
+  border-radius: 10px;
+}
+
+.completeIcon {
+  font-size: 36px;
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.completeText {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #4ade80;
+  letter-spacing: 2px;
+}
+
+/* ── Track Name ─────────────────────────────────────────────── */
+.trackName {
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #5c3f3f;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 8px;
+}

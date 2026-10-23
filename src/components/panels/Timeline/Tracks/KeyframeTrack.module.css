@@ -1,0 +1,249 @@
+/* KeyframeTrack.module.css */
+
+/* ─── Track Container ─────────────────────────────────────────────────────── */
+
+.kfTrackContainer {
+  position: relative;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.kfTrackContainer:hover {
+  background: var(--bg-hover);
+}
+
+/* ─── Keyframe Chip ───────────────────────────────────────────────────────── */
+
+.kfChip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  touch-action: none;
+  /* translate origin to diamond center */
+  transform: translateX(-8px);
+}
+
+/* Diamond marker */
+.kfDiamond {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  background: var(--kf-color, var(--accent-main));
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
+  transform: rotate(45deg);
+  box-shadow: 0 0 8px var(--kf-color, var(--accent-glow));
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+.kfChip:hover .kfDiamond {
+  transform: rotate(45deg) scale(1.2);
+  box-shadow: 0 0 14px var(--kf-color, var(--accent-glow));
+}
+
+/* Label pill */
+.kfLabel {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--kf-color, var(--accent-main));
+  background: var(--void-black);
+  border: 1px solid var(--kf-color, var(--accent-main));
+  border-radius: var(--radius-sm);
+  padding: 1px 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.kfChip:hover .kfLabel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.kfChip.selected .kfDiamond {
+  transform: rotate(45deg) scale(1.3);
+  border-color: #ffffff;
+  box-shadow: 0 0 20px var(--kf-color, var(--accent-glow));
+  z-index: 10;
+}
+
+.kfChip.selected .kfLabel {
+  opacity: 1;
+  transform: translateY(0);
+  background: var(--kf-color, var(--accent-main));
+  color: var(--text-inverse);
+}
+
+/* Transition label (always visible, slightly different style) */
+.kfTransitionLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-inverse);
+  background: var(--kf-color, #10b981);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+/* ─── Context Menu ────────────────────────────────────────────────────────── */
+
+.contextMenu {
+  background: #0a0a0c; /* Fully opaque background */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 2000;
+  backdrop-filter: none; /* Disable any transparency effects */
+}
+
+.contextMenuBtn {
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #cccccc;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.1s;
+}
+
+.contextMenuBtn:hover {
+  background: #1a1a1c;
+  color: #ffffff;
+}
+
+.contextMenuBtn.danger {
+  color: #ff4444;
+}
+
+.contextMenuBtn.danger:hover {
+  background: rgba(255, 68, 68, 0.15);
+}
+
+.contextDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 2px 0;
+}
+
+.menuLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 4px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ─── Unified Video Clips backdrop ────────────────────────────────────────── */
+
+.clipsBackdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: max-content;
+  pointer-events: none;
+  z-index: 1; /* Under keyframes which have z-index: 2+ */
+}
+
+.clipBlock {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  pointer-events: auto;
+  touch-action: none;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.clipBlock:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.25) 0%,
+    rgba(59, 130, 246, 0.15) 100%
+  ) !important;
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+}
+
+.laneControls {
+  position: absolute;
+  top: 4px;
+  right: 12px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.laneBtn {
+  background: rgba(10, 10, 12, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 3px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.1s ease;
+}
+
+.laneBtn:hover {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+/* ─── Shared Media Preview Overlay ─── */
+
+.previewOverlay {
+  position: absolute;
+  top: -85px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  width: 120px;
+  height: 68px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000000;
+  border: 1.5px solid var(--kf-color, var(--accent-main));
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.6),
+    0 0 15px var(--kf-color, var(--accent-glow));
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  transition:
+    opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kfChip:hover .previewOverlay {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}

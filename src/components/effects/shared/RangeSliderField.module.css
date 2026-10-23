@@ -1,0 +1,218 @@
+/* RangeSliderField — Dual-thumb range slider redesigned to match Stitch specification */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header > label {
+  order: 0;
+}
+
+.valueReadouts {
+  order: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.valueInput {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  width: 44px;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  outline: none;
+  appearance: textfield;
+  -moz-appearance: textfield;
+  transition: all 0.2s ease;
+}
+
+.valueInput::-webkit-inner-spin-button,
+.valueInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Active/focused or dragging state badge styling */
+.valueInputActive {
+  color: var(--accent-main) !important;
+  background: var(--accent-muted) !important;
+  border-color: var(--accent-glow) !important;
+}
+
+.valueSeparator {
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+/* Track container providing padding and centering */
+.trackContainer {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+
+/* Track — the horizontal rail */
+.track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  pointer-events: none; /* Let trackContainer handle pointer events */
+}
+
+/* Filled region between the two thumbs */
+.trackFill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: var(--accent-main);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* HUD Live Climbing Progress Visual */
+.hudProgress {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  height: calc(100% + 2px);
+  background: linear-gradient(
+    90deg,
+    rgba(34, 211, 238, 0.08) 0%,
+    rgba(34, 211, 238, 0.55) 85%,
+    rgba(34, 211, 238, 0.8) 100%
+  );
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow:
+    0 0 8px rgba(34, 211, 238, 0.35),
+    inset 0 0 4px rgba(34, 211, 238, 0.15);
+  z-index: 1;
+  transition: width 0.06s linear;
+}
+
+/* Bright leading edge */
+.hudProgress::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: -2px;
+  width: 3px;
+  height: calc(100% + 4px);
+  background: rgba(34, 211, 238, 0.9);
+  border-radius: 1px;
+  box-shadow:
+    0 0 6px rgba(34, 211, 238, 0.7),
+    0 0 12px rgba(34, 211, 238, 0.3);
+  animation: hudEdgePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes hudEdgePulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* HUD Ghost Notch Visual */
+.hudGhostNotch {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 6px rgba(255, 255, 255, 0.5),
+    0 0 2px rgba(34, 211, 238, 0.4);
+  border-radius: 1px;
+  pointer-events: none;
+  z-index: 3;
+  animation: ghostNotchPulse 2s ease-in-out infinite;
+}
+
+@keyframes ghostNotchPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Draggable thumb dots */
+.thumb {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-main);
+  border: 1.5px solid var(--bg-app);
+  box-shadow: 0 0 8px var(--accent-glow);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  touch-action: none;
+  z-index: 2;
+}
+
+.thumb:hover {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.thumbActive {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.35);
+  box-shadow: 0 0 16px var(--accent-glow);
+  background: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .valueInput {
+    font-size: 10px;
+    width: 38px;
+    padding: 1px 4px;
+  }
+
+  .valueSeparator {
+    font-size: 10px;
+  }
+
+  .thumb {
+    width: 12px;
+    height: 12px;
+  }
+}

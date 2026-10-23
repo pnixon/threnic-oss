@@ -1,0 +1,1760 @@
+.panel {
+  --panel-padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  height: 100% !important;
+  min-height: 100% !important;
+  /* Full-bleed: no panel padding. The tab rail sits flush at the top edge and
+     sections span edge-to-edge. Any interior breathing room comes from the
+     section header/content padding, not the panel. */
+  padding: 0;
+  gap: var(--space-2);
+  overflow: hidden;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  color: var(--text-primary);
+  background: var(--bg-app);
+}
+
+.contentWrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  overflow: hidden;
+}
+
+/* ═══ Horizontal Tab Rail — Top Edge ═══ */
+
+.horizontalTabRail {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  /* Themed surface (adapts to light/dark) */
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0;
+  gap: 0;
+  min-height: 36px;
+  height: auto;
+  flex-shrink: 0;
+  order: 0; /* Render before content */
+  overflow-x: auto; /* Allow horizontal scrolling */
+  overflow-y: hidden;
+  z-index: 10;
+  /* Hide scrollbar by default unless scrolling is active, but actually let's just make it tiny or invisible */
+  scrollbar-width: none; /* Firefox */
+}
+.horizontalTabRail::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.railTab {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  height: auto;
+  min-height: 38px;
+  padding: 0 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  /* Muted themed text */
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden; /* Prevent pseudo-elements from bleeding */
+}
+
+.railTab svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.65;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.railTabLabel {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.6875rem; /* ~11px */
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Hover: Brighten on obsidian ─── */
+.railTab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.railTab:hover svg {
+  opacity: 1;
+}
+
+/* ─── Active Tab: Accent ─── */
+.railTabActive {
+  background: var(--bg-hover);
+  color: var(--accent-main);
+  border-bottom: 2px solid var(--accent-main);
+  box-shadow: inset 0 0 0 1px var(--accent-glow);
+}
+
+.railTabActive svg {
+  opacity: 1;
+  color: var(--accent-main);
+}
+
+.railTabActive .railTabLabel {
+  font-weight: 700;
+  color: var(--accent-main);
+}
+
+.railTabActive::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 20px;
+  background: linear-gradient(to top, var(--accent-glow), transparent);
+  pointer-events: none;
+}
+
+.railTabActive:hover {
+  background: var(--accent-muted);
+}
+
+/* ═══ Mobile Section Sub-Tab Strip ═══
+   A thin second row of tabs under the main Lyrics/Effects/Export rail. Each
+   button selects one section (Styling / Content & Sync / Track Title, etc.)
+   instead of stacking them as vertical accordions — saving scarce mobile
+   vertical space. Only the selected section's body renders below. */
+.subTabStrip {
+  display: none; /* mobile-only; enabled in the 768px media query */
+  flex-direction: row;
+  align-items: stretch;
+  gap: 4px;
+  padding: 6px 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-shrink: 0;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.subTabStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.subTab {
+  flex: 1 1 auto;
+  min-width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  min-height: 34px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.6875rem; /* ~11px */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.subTab svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.subTab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.subTabActive {
+  background: var(--accent-muted);
+  border-color: var(--accent-main);
+  color: var(--accent-main);
+}
+
+.subTabActive svg {
+  opacity: 1;
+  color: var(--accent-main);
+}
+
+.innerWrapper {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  order: 1; /* Content before rail */
+}
+
+.scrollContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  /* Full-bleed: content spans the panel width. A small right inset keeps the
+     scrollbar off the section content. */
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Responsive panel adjustments */
+@media (max-width: 1200px) {
+  .panel {
+    --panel-padding: var(--space-2);
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 1024px) {
+  .panel {
+    --panel-padding: var(--space-1);
+    gap: var(--space-2);
+  }
+
+  .horizontalTabRail {
+    min-height: 32px;
+  }
+}
+
+@media (max-width: 900px) {
+  .panel {
+    --panel-padding: var(--space-1);
+    gap: var(--space-1);
+  }
+
+  .workflowTabs {
+    height: 38px;
+  }
+
+  .monitorContent {
+    height: 80px;
+    max-height: 80px;
+  }
+
+  .sectionHeader {
+    padding: var(--space-1);
+  }
+
+  .sectionContentInner {
+    padding: var(--space-1);
+    gap: var(--space-2);
+  }
+
+  .toggleLabel {
+    font-size: 12px;
+  }
+
+  .toggleRow {
+    padding: 4px 6px;
+  }
+}
+
+/* Scrollbar styling */
+.scrollableContent {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  /* Space for scrollbar */
+  margin-right: -4px;
+  /* Align with edge */
+}
+
+.exportContainer {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sections — full-width flat bands (no bordered/rounded card box).
+   Sections read as edge-to-edge stripes; the visible dividers come from the
+   header band's top/bottom rules rather than a box border. */
+.section {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+
+.section:hover {
+  border: none;
+  box-shadow: none;
+}
+
+/* Full-bleed layout: sections butt flush against each other so the header
+   band rules form the only dividers (no dark gap strips between them). This
+   overrides the Tailwind `gap-3` on the section wrapper. */
+.sectionSubTabbed {
+  gap: 0 !important;
+}
+
+/* Headless Section (For Workflow Tabs) */
+.headlessSection {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: var(--space-2);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Full-width flush header. PanelSection sets padding / background / border /
+   border-radius as INLINE styles on the header button, so these overrides
+   need !important to win. The header now reads as an edge-to-edge title band
+   (no rounded bordered box) sitting above its section body, delineated by a
+   strong top+bottom rule for visibility. */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4) !important;
+  background: var(--bg-hover) !important;
+  border: none !important;
+  border-top: 1px solid var(--border-strong, var(--border-hover)) !important;
+  border-bottom: 1px solid var(--border-strong, var(--border-hover)) !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sectionHeader:hover {
+  background: var(--bg-hover);
+  opacity: 0.8;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  transform: rotate(-90deg);
+}
+
+.chevron.open {
+  transform: rotate(0deg);
+}
+
+.sectionContent {
+  transition: height 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sectionContentInner {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Workflow Tabs */
+.tabsHeaderContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* gap-2 in Tailwind */
+  margin-bottom: var(--space-4);
+  flex-shrink: 0;
+}
+
+.workflowTabs {
+  display: flex;
+  background: var(--bg-input);
+  padding: 4px;
+  border-radius: 8px;
+  height: 44px;
+  flex: 1;
+}
+
+.workflowTab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-app);
+  color: var(--text-secondary);
+  position: relative;
+  /* Arrow Shape via clip-path */
+  clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0% 100%, 10% 50%, 0% 0%);
+  margin-left: -12px;
+  padding: 0 4px 0 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.workflowTab:first-child {
+  margin-left: 0;
+  padding-left: 0;
+  clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0% 100%, 0% 0%);
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.workflowTab:last-child {
+  clip-path: polygon(100% 0, 100% 100%, 0% 100%, 10% 50%, 0% 0%);
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.workflowTab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  z-index: 5;
+}
+
+.workflowTabActive {
+  background: var(--bg-hover) !important;
+  color: var(--accent-main) !important;
+  z-index: 10;
+  /* Create an "outline" effect using multiple drop-shadows that follow the clip-path */
+  filter: drop-shadow(0 0 0.5px var(--accent-main)) drop-shadow(0 0 1px var(--accent-glow));
+  border: 1px solid var(--accent-glow) !important;
+}
+
+.workflowTabActive .tabNumber,
+.workflowTabActive .tabLabel {
+  color: var(--accent-main) !important;
+  opacity: 1 !important;
+}
+
+.tabNumber {
+  font-size: 9px;
+  font-weight: 800;
+  opacity: 0.6;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.tabLabel {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Background Section */
+.bgSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.imagePreviewArea {
+  width: 100%;
+}
+
+.previewContainer {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+
+.bgUploadBtn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 32px;
+  padding: 0;
+  background: var(--bg-hover);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bgUploadBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-main);
+  color: var(--text-primary);
+  box-shadow: 0 0 15px var(--accent-muted);
+}
+
+.bgPreview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-panel);
+}
+
+.bgPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bgPreviewContainer {
+  width: 100%;
+}
+
+/* Background Preview Wrapper with Hover Overlay */
+.bgPreviewWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-panel);
+}
+
+.bgPreviewWrapper img,
+.bgPreviewWrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bgPreviewOverlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-app);
+  opacity: 0.85;
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: var(--radius-md, 8px);
+}
+
+.bgPreviewWrapper:hover .bgPreviewOverlay {
+  opacity: 1;
+}
+
+/* Background Overlay Menu */
+.bgOverlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-app);
+  opacity: 0.8;
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: all 0.2s ease;
+  border-radius: var(--radius-md, 8px);
+}
+
+.previewContainer:hover .bgOverlay {
+  opacity: 1;
+}
+
+.overlayBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  width: 120px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.overlayBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.remove {
+  border-color: var(--accent-muted);
+  color: var(--accent-main);
+}
+
+.remove:hover {
+  background: var(--accent-muted);
+  border-color: var(--accent-main);
+  color: var(--accent-main);
+}
+
+/* Theme / Button Grids */
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.optionBtn {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.optionBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.optionBtn.selected {
+  background: var(--accent-muted);
+  border-color: var(--accent-main);
+  color: var(--text-primary);
+  box-shadow: 0 0 12px var(--accent-muted);
+}
+
+.optionBtn.selectedTheme {
+  background: var(--accent-muted);
+  border-color: var(--accent-main);
+  color: var(--text-primary);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Field Groups */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─── Lyric FX section ─────────────────────────────────────── */
+.fieldRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.toggleButton {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  background: var(--bg-glass, rgba(22, 24, 28, 0.7));
+  color: var(--text-primary, #e6e6e6);
+  cursor: pointer;
+}
+
+.toggleButton[aria-pressed='true'] {
+  background: var(--accent, #6ea8fe);
+  color: #0b0d10;
+  border-color: transparent;
+}
+
+.hintText {
+  font-size: 11px;
+  color: var(--text-muted, #9aa0a6);
+  margin: 4px 0 8px;
+  line-height: 1.4;
+}
+
+.subSectionLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #9aa0a6);
+  margin: 10px 0 4px;
+}
+
+.effectStackRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: var(--bg-glass, rgba(22, 24, 28, 0.5));
+  margin: 3px 0;
+}
+
+.effectStackName {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-primary, #e6e6e6);
+}
+
+.effectStackStage {
+  color: var(--text-muted, #9aa0a6);
+  font-size: 10px;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted, #9aa0a6);
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, #e6e6e6);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.addChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 7px;
+  font-size: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: var(--text-primary, #e6e6e6);
+  cursor: pointer;
+}
+
+.addChip:hover {
+  background: var(--accent, #6ea8fe);
+  color: #0b0d10;
+  border-color: transparent;
+}
+
+.effectStackItem {
+  margin: 3px 0;
+}
+
+.effectParams {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 6px 6px 24px;
+}
+
+.paramRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paramLabel {
+  flex: 0 0 84px;
+  font-size: 10px;
+  color: var(--text-muted, #9aa0a6);
+}
+
+.paramSlider {
+  flex: 1;
+  min-width: 0;
+}
+
+.paramValue {
+  flex: 0 0 34px;
+  text-align: right;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary, #e6e6e6);
+}
+
+.paramColor {
+  width: 28px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.paramSelect {
+  flex: 1;
+  font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  background: var(--bg-glass, rgba(22, 24, 28, 0.7));
+  color: var(--text-primary, #e6e6e6);
+}
+
+.valueLabel {
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--accent-main);
+  background: var(--accent-muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Slider */
+.slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--accent-main);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-glow);
+  transition: transform 0.1s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--accent-main);
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 0 8px var(--accent-glow);
+  transition: transform 0.1s ease;
+}
+
+/* Button Group (Icon Grid) */
+.buttonGroup {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.groupBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.groupBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.groupBtn.active {
+  background: var(--accent-muted);
+  color: var(--accent-main);
+}
+
+/* Toggle Group for Effects */
+.toggleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-input);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.toggleRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.toggleRow:hover {
+  background: var(--bg-hover);
+}
+
+/* Audio-reactive meter for toggle rows */
+.toggleMeter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  opacity: 0.2;
+  transition: width 75ms ease-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.toggleMeterBass {
+  background: linear-gradient(90deg, #ef4444 0%, #ef444488 100%);
+}
+
+.toggleMeterMid {
+  background: linear-gradient(90deg, #22c55e 0%, #22c55e88 100%);
+}
+
+.toggleMeterHigh {
+  background: linear-gradient(90deg, #3b82f6 0%, #3b82f688 100%);
+}
+
+.toggleMeterEnergy {
+  background: linear-gradient(90deg, #ef4444 0%, #ef444488 100%);
+}
+
+/* Ensure toggle row content is above meter */
+.toggleRowContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+/* Band badge for toggle rows */
+.toggleBandBadge {
+  position: relative;
+  z-index: 1;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  opacity: 0.8;
+}
+
+.toggleBadgeBass {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.toggleBadgeMid {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.toggleBadgeHigh {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.toggleBadgeEnergy {
+  color: var(--accent-main);
+  background: var(--accent-muted);
+}
+
+.toggleCheckbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-main);
+  cursor: pointer;
+}
+
+.toggleLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.gearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gearButton:hover {
+  background: var(--accent-muted);
+  border-color: var(--accent-glow);
+  color: var(--accent-main);
+}
+
+/* Edit Button */
+.editButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editButton:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* Select */
+.select {
+  width: 100%;
+  padding: 8px 12px;
+  padding-right: 32px;
+  /* Space for arrow */
+  background-color: var(--bg-input);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.select:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--accent-main);
+  box-shadow: 0 0 0 1px var(--accent-muted);
+  /* Focus ring */
+  background-color: var(--accent-muted);
+}
+
+.select option {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  padding: 8px;
+}
+
+/* Primary Action Button (Export) */
+.primaryBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--accent-main);
+  border: 1px solid var(--accent-glow);
+  border-radius: 6px;
+  color: var(--text-inverse);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px var(--accent-muted);
+}
+
+.primaryBtn:hover {
+  background: var(--accent-main);
+  opacity: 0.9;
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Sync Lyrics Button */
+.syncBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--accent-muted);
+  border: 1px solid var(--accent-glow);
+  border-radius: 6px;
+  color: var(--accent-main);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.syncBtn:hover {
+  background: var(--accent-muted);
+  opacity: 0.8;
+  border-color: var(--accent-main);
+  color: var(--accent-main);
+  box-shadow: 0 0 15px var(--accent-muted);
+}
+
+/* Color Grid Styling */
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.colorItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.colorItem label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.colorItem input[type='color'] {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid var(--border-subtle);
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--bg-input);
+  padding: 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.colorItem input[type='color']:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-panel);
+}
+
+.colorItem input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 3px;
+}
+
+.colorItem input[type='color']::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border-subtle);
+  z-index: 10;
+}
+
+/* Audio/Signal Monitor Section (Matching Left Panel) */
+.monitorSection {
+  margin-top: auto;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-2);
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.monitorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.monitorHeader:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.collapseIcon {
+  transition: transform 0.3s ease;
+  color: var(--text-muted);
+  transform: rotate(0deg);
+}
+
+.collapsed .collapseIcon {
+  transform: rotate(-90deg);
+}
+
+.monitorContent {
+  height: 110px;
+  max-height: 110px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  padding: 12px 16px 0 16px;
+  background: var(--bg-app);
+  border-radius: 8px 8px 0 0;
+  margin: 4px 4px 0 4px;
+}
+
+.collapsed .monitorContent {
+  height: 0;
+  max-height: 0;
+  padding: 0 12px;
+  margin-top: 0;
+  margin-bottom: 0;
+  opacity: 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .sectionHeader {
+    padding: var(--space-2);
+  }
+
+  .sectionContentInner {
+    padding: var(--space-2);
+    gap: var(--space-3);
+  }
+}
+
+.disabledOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  pointer-events: all;
+}
+
+.disabledMessage {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--shadow-elevated);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  filter: grayscale(0.5);
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .panel {
+    --panel-padding: var(--space-4);
+    padding-bottom: var(
+      --space-4
+    ); /* Drawer sits directly above the nav bar; no timeline to clear */
+    overflow: hidden; /* Ensure panel doesn't scroll, let inner container scroll */
+  }
+
+  /* Touch-friendly Studio tab rail: taller tap targets, always-visible labels,
+     larger icons. Icon-only 14px tabs are too small to hit reliably on a phone. */
+  .horizontalTabRail {
+    min-height: 52px;
+  }
+
+  .railTab {
+    min-height: 52px;
+    gap: 5px;
+    flex-direction: column;
+    padding: 6px 4px;
+  }
+
+  .railTab svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .railTabLabel {
+    font-size: 0.625rem; /* ~10px */
+  }
+
+  /* Enable the section sub-tab strip on mobile. Styled as full-width/height
+     blocks (like the main Lyrics/Effects/Export rail) rather than small pill
+     buttons: equal-width columns, tall tap targets, icon-over-label, flush
+     edge-to-edge with no gaps so they read as a second tab row. */
+  .subTabStrip {
+    display: flex;
+    gap: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .subTab {
+    flex: 1 1 0;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 4px;
+    min-height: 52px;
+    background: var(--bg-panel);
+    border: none;
+    border-right: 1px solid var(--border-subtle);
+    border-radius: 0;
+    font-size: 0.625rem; /* ~10px */
+  }
+
+  .subTab:last-child {
+    border-right: none;
+  }
+
+  .subTab svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .subTabActive {
+    background: var(--accent-muted);
+    border-color: var(--border-subtle);
+    color: var(--accent-main);
+    box-shadow: inset 0 -2px 0 0 var(--accent-main);
+  }
+
+  /* With the sub-tab strip driving section switching, the per-section
+     accordion headers are redundant — hide them and let the selected
+     section's body render directly. The keyframe selector is now a sub-tab
+     section too, so it is treated identically (no persistent header/box).
+     NOTE: PanelSection sets `display:flex` and the box chrome as INLINE
+     styles on the header button and <section>, so these overrides need
+     !important to win. */
+  .sectionSubTabbed .sectionHeader {
+    display: none !important;
+  }
+
+  /* Hide the panel outlines on mobile: the selected section's body renders
+     flush (no bordered/filled box, no radius, no shadow) so it reads as the
+     panel content directly under the sub-tab strip. */
+  .sectionSubTabbed .section {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .sectionSubTabbed .section:hover {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .monitorSection {
+    margin-top: var(--space-4);
+    position: relative;
+    z-index: 5;
+    background: var(--bg-panel); /* Ensure opacity covers content if overlap occurs (fallback) */
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* Scroll Overflow Indicators */
+.innerWrapper .absolute.top-0.left-0.right-0 {
+  background: linear-gradient(to bottom, var(--bg-app) 0%, transparent 100%) !important;
+}
+
+.innerWrapper .absolute.bottom-0.left-0.right-0 {
+  background: linear-gradient(to top, var(--bg-app) 0%, transparent 100%) !important;
+}
+
+.innerWrapper .w-full.h-\[1px\].bg-purple-500\/50 {
+  background-color: var(--accent-glow) !important;
+  box-shadow: 0 0 15px var(--accent-muted) !important;
+}
+
+.keyframeInput {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 4px;
+  width: 60px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.keyframeInput:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-main);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.keyframeInput:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Keyframe animations used by vertical tab rail */
+@keyframes subtab-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.masterKeyframeHeader {
+  background: var(--bg-panel);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-panel);
+}
+
+.masterKeyframeHeaderTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Per-Line Style Editor
+   ═══════════════════════════════════════════════════════ */
+
+.lineStyleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.lineStyleRow:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.lineStyleRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.lineStyleRowRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.lineStyleIndex {
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--text-muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.lineStyleText {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lineStyleBadge {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-main);
+  background: var(--accent-muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.lineOverrideEditor {
+  padding: 8px 10px 10px;
+  margin: 0 0 2px;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 0 0 6px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: none;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.overrideBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+  background: var(--accent-muted);
+  color: var(--accent-main);
+  border: none;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  vertical-align: middle;
+}
+
+.overrideBadge:hover {
+  background: var(--accent-main);
+  color: #fff;
+}
+
+.textInput {
+  width: 100%;
+  padding: 4px 8px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 11px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.textInput::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.textInput:focus {
+  border-color: var(--accent-main);
+  box-shadow: 0 0 6px var(--accent-muted);
+}
+
+.select {
+  width: 100%;
+  padding: 4px 8px;
+  background: var(--bg-input, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.select:focus {
+  border-color: var(--accent-main);
+}
+
+.lineStyleActionBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.lineStyleActionBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.lineStyleActionBtnDanger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+/* ── Lane Selector ── */
+.laneSelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.laneSelectorLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.laneSelectorDropdown {
+  flex: 1;
+  padding: 3px 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.laneSelectorDropdown:focus {
+  border-color: var(--accent-main);
+}
+
+.laneSelectorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

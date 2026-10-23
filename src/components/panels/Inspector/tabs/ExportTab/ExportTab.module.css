@@ -1,0 +1,726 @@
+/* ExportTab - Semantic Theme Styling */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-app);
+}
+
+/* Scrollable Settings Area */
+.scrollableSettings {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  /* No inter-section spacing so sections sit flush like the playlist rows. */
+  gap: 0;
+  padding-right: 0;
+}
+
+/* Section headers, spacing, and labels are provided by CollapsibleSection via
+   Inspector.module.css (.section / .sectionHeader / .sectionTitle), so the
+   Export sections match the Effects/Lyrics tabs 1:1. No local overrides here. */
+
+/* Mode Selection */
+.modeOptions {
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.modeOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.modeOption:hover {
+  background: var(--bg-hover);
+}
+
+.modeActive {
+  background: var(--accent-muted);
+  border-color: var(--accent-glow);
+}
+
+.radioHidden {
+  display: none;
+}
+
+.radioIndicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.modeActive .radioIndicator {
+  border-color: var(--accent-main);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.radioInner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-main);
+  box-shadow: 0 0 8px var(--accent-main);
+}
+
+.modeContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modeLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+}
+
+.modeActive .modeLabel {
+  color: var(--text-primary);
+}
+
+.modeSubtext {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Track Selection Section */
+.trackSection {
+  flex-shrink: 0;
+  max-height: 200px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.trackSection:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-panel);
+}
+
+.trackHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.trackHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.trackCount {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-main);
+  background: var(--accent-muted);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--accent-glow);
+}
+
+/* Track List */
+.trackList {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.trackItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  background: var(--bg-hover);
+}
+
+.trackItem:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-subtle);
+}
+
+.trackSelected {
+  background: var(--accent-muted);
+  border-color: var(--accent-glow);
+}
+
+.trackSelected:hover {
+  background: var(--accent-muted);
+  opacity: 0.8;
+  border-color: var(--accent-main);
+}
+
+.trackOrder {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.trackSelected .trackOrder {
+  color: var(--accent-main);
+  background: var(--accent-muted);
+}
+
+.trackCheckbox {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1.5px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.trackChecked {
+  background: var(--accent-main);
+  border-color: var(--accent-main);
+  color: var(--text-inverse);
+  box-shadow: 0 0 8px var(--accent-muted);
+}
+
+.trackIcon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.trackSelected .trackIcon {
+  background: var(--accent-muted);
+  color: var(--accent-main);
+}
+
+.trackInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.trackName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackSelected .trackName {
+  color: var(--text-primary);
+}
+
+.trackDuration {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.emptyState {
+  padding: var(--space-6);
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+/* Total Duration */
+.totalDuration {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-input);
+  border-top: 1px solid var(--border-subtle);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.totalDurationValue {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-main);
+}
+
+/* Action Area */
+.actionArea {
+  flex-shrink: 0;
+  padding-top: var(--space-2);
+  margin-top: var(--space-1);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.progressContainer {
+  background: var(--bg-input);
+  border: 1px solid var(--accent-glow);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.progressLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trackCounter {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.progressPercent {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-hover);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+  position: relative;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent-main);
+  border-radius: 9999px;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 12px var(--accent-muted);
+}
+
+.progressDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) 0;
+}
+
+.progressFrame {
+  font-size: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.progressTime {
+  font-size: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-main);
+}
+
+.progressStats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  padding: var(--space-2);
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+.progressFps {
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-main);
+}
+
+.progressEta {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.cancelBtn {
+  width: 100%;
+  padding: var(--space-2);
+  background: var(--accent-muted);
+  border: 1px solid var(--accent-glow);
+  border-radius: var(--radius-md);
+  color: var(--accent-main);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cancelBtn:hover {
+  background: var(--accent-muted);
+  opacity: 0.8;
+  border-color: var(--accent-main);
+}
+
+.exportActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.warningBox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: rgba(234, 179, 8, 0.05);
+  border: 1px solid rgba(234, 179, 8, 0.15);
+  border-radius: var(--radius-md);
+  font-size: 10px;
+  line-height: 1.4;
+  color: #ca8a04;
+}
+
+[data-theme='dark'] .warningBox {
+  color: rgba(250, 204, 21, 0.8);
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.exportBtn {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--accent-main);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-elevated);
+}
+
+.exportBtn:hover:not(.exportDisabled) {
+  transform: translateY(-2px);
+  opacity: 0.9;
+  box-shadow: 0 6px 30px var(--accent-glow);
+}
+
+.exportBtn:active:not(.exportDisabled) {
+  transform: translateY(0);
+}
+
+.exportDisabled {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Resolution & FPS Selection */
+.settingsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+@media (max-width: 900px) {
+  .settingsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settingsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.groupLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding-left: var(--space-1);
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  border: 1px solid var(--border-subtle);
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 11px;
+  color: var(--text-secondary);
+  /* Unselected state still reads as a button: subtle surface + outline */
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+}
+
+.optionItem:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.optionActive {
+  background: var(--accent-muted) !important;
+  color: var(--accent-main) !important;
+  font-weight: 600;
+  border-color: var(--accent-main) !important;
+}
+
+.optionLocked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aspectVisual {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  opacity: 0.5;
+}
+
+.aspectLandscape {
+  width: 16px;
+  height: 9px;
+}
+
+.aspectPortrait {
+  width: 9px;
+  height: 16px;
+}
+
+.aspectSquare {
+  width: 12px;
+  height: 12px;
+}
+
+.previewBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.previewBtn:hover {
+  background: var(--bg-hover);
+  opacity: 0.8;
+  color: var(--text-primary);
+}
+
+.previewActive {
+  background: var(--accent-muted);
+  border-color: var(--accent-glow);
+  color: var(--accent-main);
+}
+
+.aspectContent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Tracklist Section */
+.headerActionBtn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.headerActionBtn:hover,
+.copyBtn:hover {
+  background: var(--bg-hover);
+  opacity: 0.8;
+  color: var(--text-primary);
+}
+
+.tracklistContainer {
+  padding: var(--space-2);
+  /* Grow to fill available panel height (mobile shows one section at a time). */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Copy button floats inside the textarea's top-right corner (matches the
+   Effects Summary panel) rather than sitting in a row above it. */
+.tracklistContainer .copyBtn {
+  position: absolute;
+  top: calc(var(--space-2) + 6px);
+  right: calc(var(--space-2) + 6px);
+  z-index: 1;
+  opacity: 0.75;
+}
+.tracklistContainer .copyBtn:hover {
+  opacity: 1;
+}
+
+.tracklistTextarea {
+  width: 100%;
+  height: 80px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  /* leave room so text doesn't run under the overlaid copy button */
+  padding-right: 40px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-family: monospace;
+  resize: none;
+  outline: none;
+}
+
+.tracklistTextarea:focus {
+  border-color: var(--accent-glow);
+  color: var(--text-primary);
+}
+
+/* On mobile the tracklist is the only visible section — let it fill the drawer
+   instead of sitting in a short 80px box above a large empty area. */
+@media (max-width: 768px) {
+  .tracklistTextarea {
+    height: auto;
+    flex: 1 1 auto;
+    min-height: calc(var(--mobile-drawer-height, 48vh) - 160px);
+  }
+}
+
+/* ── Config Summary moved to the Effects tab (EffectsSummarySection). ── */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* ─── Responsive Breakpoints ─────────────── */
+
+@media (max-width: 768px) {
+  .settingsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}

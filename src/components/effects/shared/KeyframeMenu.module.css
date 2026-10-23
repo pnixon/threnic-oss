@@ -1,0 +1,62 @@
+.contextMenu {
+  background: #0a0a0c;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 5000;
+}
+
+.contextMenuBtn {
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #cccccc;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.1s;
+  width: 100%;
+}
+
+.contextMenuBtn:hover {
+  background: #1a1a1c;
+  color: #ffffff;
+}
+
+.contextMenuBtn.danger {
+  color: #ff4444;
+}
+
+.contextMenuBtn.danger:hover {
+  background: rgba(255, 68, 68, 0.15);
+}
+
+.contextMenuBtn.active {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.contextMenuBtn.active:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.contextLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #666666;
+  padding: 4px 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.contextDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}

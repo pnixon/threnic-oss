@@ -1,0 +1,1175 @@
+/* LyricSyncPanel — Three-panel fullscreen sync experience */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  width: 100dvw;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(12px, 2vh, 16px) clamp(16px, 2vw, 24px);
+  color: white;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* ──── Header ──── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.trackInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.trackName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--crucible-red);
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+/* ──── Three-panel container ──── */
+.threePanel {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+/* ──── Shared panel header ──── */
+.panelTitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+/* ──────────────────────────────────────────
+   LEFT PANEL — Lyrics editor
+   ────────────────────────────────────────── */
+.leftPanel {
+  flex: 0 0 clamp(280px, 25%, 500px);
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.editorContainer {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Highlight band that tracks the active line */
+.lineHighlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 2px solid var(--crucible-red);
+  pointer-events: none;
+  z-index: 1;
+  transition: top 0.2s ease;
+}
+
+.editorTextarea {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  line-height: 29px; /* must match EDITOR_LINE_HEIGHT */
+  font-family: 'Inter', system-ui, sans-serif;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+  position: relative;
+  z-index: 2;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.editorTextarea:focus {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.editorTextarea::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ──────────────────────────────────────────
+   CENTER PANEL — Sync display
+   ────────────────────────────────────────── */
+.centerPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 2vh, 24px);
+  padding: clamp(12px, 2vw, 24px);
+  min-width: 0;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.centerPanel.centerFocused {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* "Click here to sync" overlay */
+.focusHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Word display ── */
+.wordDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 1vh, 12px);
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: lineEntry 0.4s ease-out;
+}
+
+.lineInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@keyframes lineEntry {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.activeLine {
+  z-index: 2;
+}
+
+/* All words share the same size → no layout reflow */
+.word {
+  font-size: clamp(1.4rem, 2.5vw, 2.6rem);
+  font-weight: 500;
+  transition:
+    color 0.15s ease,
+    opacity 0.15s ease,
+    text-shadow 0.15s ease;
+  opacity: 0.3;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.word.current {
+  color: var(--crucible-red);
+  opacity: 1;
+  text-shadow: 0 0 30px var(--crucible-red-glow);
+}
+
+.word.past {
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0.5;
+}
+
+.word.upcoming {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Standby (not syncing) ── */
+.standby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 40px;
+}
+
+.standby svg {
+  color: var(--crucible-red);
+  opacity: 0.5;
+}
+
+.standbyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.standbyInstructions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.standbyInstructions p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+.standbyInstructions kbd {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--crucible-red);
+  margin: 0 2px;
+}
+
+/* ── Progress ── */
+.progressContainer {
+  width: 100%;
+  max-width: min(400px, 80%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #991b1b, #ef4444);
+  border-radius: 2px;
+  transition: width 0.1s ease;
+}
+
+.progressText {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Live Preview ── */
+.preview {
+  width: 100%;
+  max-width: min(800px, 95%);
+  background: rgba(10, 10, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: clamp(8px, 1vw, 14px) clamp(12px, 1.5vw, 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.previewLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+}
+
+.previewContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 4.8rem;
+  gap: 4px;
+}
+
+.previewLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+/* Previous line — always visible, dimmed */
+.previewPrevLine {
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+
+/* Exiting line: slides up and fades out */
+.previewExiting {
+  animation: previewFadeUpOut 0.45s ease-out forwards;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Entering line: slides up from below */
+.previewEntering {
+  animation: previewFadeUpIn 0.4s ease-out;
+}
+
+@keyframes previewFadeUpOut {
+  0% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes previewFadeUpIn {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.previewWord {
+  font-size: clamp(0.9rem, 1.3vw, 1.4rem);
+  font-weight: 500;
+  transition:
+    color 0.15s ease,
+    opacity 0.15s ease,
+    text-shadow 0.15s ease;
+  white-space: nowrap;
+}
+
+.previewWord.previewActive {
+  color: var(--crucible-red);
+  opacity: 1;
+  text-shadow: 0 0 20px var(--crucible-red-glow);
+}
+
+.previewWord.previewPast {
+  color: rgba(255, 255, 255, 0.45);
+  opacity: 0.7;
+}
+
+.previewWord.previewUpcoming {
+  color: rgba(255, 255, 255, 0.25);
+  opacity: 0.5;
+}
+
+/* ──────────────────────────────────────────
+   RIGHT PANEL — Controls & Settings
+   ────────────────────────────────────────── */
+.rightPanel {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-y: auto;
+}
+
+/* ── Control buttons ── */
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.controlBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  width: 100%;
+  text-align: left;
+}
+
+.controlBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.controlBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.doneBtn {
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.doneBtn:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.controlDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 4px 0;
+}
+
+.primaryBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: linear-gradient(135deg, #991b1b, #ef4444);
+  color: white;
+  box-shadow: 0 4px 20px var(--crucible-red-muted);
+  width: 100%;
+  justify-content: center;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  box-shadow: 0 6px 24px var(--crucible-red-glow);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a1;
+  width: 100%;
+  justify-content: center;
+}
+
+.saveBtn:hover {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+/* ── Settings sliders ── */
+.settingGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settingLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.settingValue {
+  font-weight: 500;
+  color: var(--crucible-red);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.settingSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.settingSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--crucible-red);
+  cursor: pointer;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+  transition: box-shadow 0.2s ease;
+}
+
+.settingSlider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+}
+
+.settingSlider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--crucible-red);
+  cursor: pointer;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Shortcuts ── */
+.shortcutList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shortcutRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kbdSmall {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--crucible-red);
+  min-width: 30px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.shortcutLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+/* ── Sync Complete Card ── */
+.syncCompleteCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  animation: syncCompleteEntry 0.6s ease-out;
+}
+
+@keyframes syncCompleteEntry {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.syncCompleteIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.08));
+  border: 2px solid rgba(34, 197, 94, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #22c55e;
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.2);
+  animation: syncIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes syncIconPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.3);
+  }
+}
+
+.syncCompleteTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.syncCompleteHint {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.syncCompleteHint kbd {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #22c55e;
+  margin: 0 2px;
+}
+
+.syncCompleteBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+  background: linear-gradient(135deg, #166534, #22c55e);
+  color: white;
+  box-shadow: 0 4px 24px rgba(34, 197, 94, 0.3);
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+}
+
+.syncCompleteBtn:hover {
+  box-shadow: 0 6px 32px rgba(34, 197, 94, 0.45);
+  transform: translateY(-1px);
+}
+
+.syncCompleteBtn:active {
+  transform: translateY(0);
+}
+
+/* ──── Responsive ──── */
+@media (max-width: 1200px) {
+  .leftPanel {
+    flex: 0 0 28%;
+    min-width: 220px;
+  }
+
+  .rightPanel {
+    width: 180px;
+  }
+}
+
+@media (max-width: 900px) {
+  .leftPanel {
+    display: none;
+  }
+
+  .rightPanel {
+    width: 170px;
+  }
+
+  .lineInner {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .panel {
+    padding: 12px;
+  }
+
+  .rightPanel {
+    width: 150px;
+    padding: 10px;
+  }
+
+  .lineInner {
+    gap: 10px;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--crucible-red);
+}
+
+/* ──────────────────────────────────────────
+   MOBILE-ONLY STYLES & LAYOUT REFIT
+   ────────────────────────────────────────── */
+
+.mobileMainContainer {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  justify-content: space-between;
+  gap: clamp(6px, 1.2vh, 12px);
+  box-sizing: border-box;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.mobileVisualStage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
+  gap: clamp(8px, 1.8vh, 16px);
+  width: 100%;
+}
+
+/* Bottom touch control deck styling */
+.mobileControlDeck {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
+
+.hitRow {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.giantWordBtn {
+  flex: 2;
+  min-height: 56px;
+  background: #4ede93;
+  color: #0d1117;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 15px rgba(78, 222, 147, 0.35);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.giantWordBtn:active {
+  background: #3ac07b;
+  transform: scale(0.97);
+  box-shadow: 0 0 8px rgba(78, 222, 147, 0.2);
+}
+
+.giantLineBtn {
+  flex: 1.2;
+  min-height: 56px;
+  background: rgba(78, 222, 147, 0.08);
+  color: #4ede93;
+  border: 1px solid rgba(78, 222, 147, 0.35);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.giantLineBtn:active {
+  background: rgba(78, 222, 147, 0.16);
+  transform: scale(0.97);
+}
+
+/* Secondary utility button row */
+.utilityRow {
+  display: flex;
+  width: 100%;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.utilityBtn {
+  flex: 1;
+  min-height: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.utilityBtn:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: scale(0.96);
+}
+
+.utilityBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.mobileDoneBtn {
+  color: #ff525c !important;
+  border-color: rgba(255, 82, 92, 0.25) !important;
+  background: rgba(255, 82, 92, 0.04) !important;
+}
+
+.mobileDoneBtn:active {
+  background: rgba(255, 82, 92, 0.12) !important;
+}
+
+/* Mobile Standby screen styles */
+.mobileStandbyContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  min-height: 0;
+  min-width: 0;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.mobileEditorWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mobileEditorTextarea {
+  width: 100%;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  color: white;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family: inherit;
+}
+
+.mobileEditorTextarea:focus {
+  border-color: rgba(78, 222, 147, 0.3);
+}
+
+.mobileSettingsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mobileSettingGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobileSettingLabelRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.mobileStandbyButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mobilePrimaryBtn {
+  width: 100%;
+  min-height: 48px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981, #4ede93);
+  color: #0d1117;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(78, 222, 147, 0.3);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mobilePrimaryBtn:active {
+  transform: scale(0.98);
+}
+
+.mobilePrimaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mobileSaveBtn {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(78, 222, 147, 0.3);
+  border-radius: 8px;
+  background: rgba(78, 222, 147, 0.05);
+  color: #4ede93;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mobileSaveBtn:active {
+  background: rgba(78, 222, 147, 0.12);
+}
+
+/* ── Unsupported viewport screen size guard overlay ── */
+.unsupportedOverlay {
+  position: absolute;
+  inset: 0;
+  background: #050508;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.unsupportedCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  border: 1px solid rgba(255, 82, 92, 0.3);
+  border-radius: 12px;
+  padding: 24px 20px;
+  background: rgba(255, 82, 92, 0.02);
+  max-width: 280px;
+  box-shadow: 0 0 25px rgba(255, 82, 92, 0.15);
+}
+
+.unsupportedIcon {
+  color: #ff525c;
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+.unsupportedTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffb4ab;
+  margin: 0;
+}
+
+.unsupportedText {
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.unsupportedDiagnostics {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 6px;
+}
+
+@keyframes alertPulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}

@@ -1,0 +1,118 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# credentials
+Admin_accessKeys.csv
+Admin_credentials.csv
+# Google OAuth client secret downloads — never commit
+client_secret_*.json
+*.apps.googleusercontent.com.json
+
+# testing
+/coverage
+/test-results/
+test-results.md
+test-output*
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+
+node_modules
+
+# leftover local artifacts from the removed AWS backend — never commit
+.amplify
+amplify_outputs*
+amplifyconfiguration*
+
+/src/generated/prisma
+
+# headless rendering
+/output
+
+# local KiroCrew agent settings (machine-local, not source)
+.kiro/settings/cli.json
+
+# secret-purge scratch (raw credential literals + standalone tool) — never commit
+secrets.txt
+git-filter-repo.py
+/render-jobs/processed
+/render-jobs/failed
+/audio
+/fonts
+
+# renderer build/output artifacts
+renderer/.venv/
+renderer/__pycache__/
+renderer/**/__pycache__/
+renderer/**/*.pyc
+renderer/*.mp4
+renderer/*.log
+renderer/*.txt
+renderer/dist/
+renderer/build/
+*.log
+*.zip
+/midjourney_extracted/
+/dist/
+
+# local agent/tool settings (may contain credentials in permission allowlists)
+.claude/settings.local.json
+
+# scratch / test / hygiene artifacts (should never be tracked)
+scratch/
+playwright-report/
+.npm/
+wiki/log.md
+
+# large binary media — prevent accidental commits
+*.mp4
+*.mp3
+*.wav
+*.flac
+*.ogg
+*.webm
+*.mov
+*.avi
+*.mkv
+*.thren
+# exceptions: small test fixtures that must stay tracked
+!playwright-report/**/*.webm
+!src/test/e2e/fixtures/*.mp3
+
+# wrangler
+.wrangler/
+.wrangler
