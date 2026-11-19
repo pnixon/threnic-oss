@@ -40,6 +40,14 @@ export const metadata: Metadata = {
   },
 };
 
+// three/webgpu (r182) reads `self.GPUShaderStage.VERTEX` while its module loads,
+// which throws in browsers without WebGPU (Firefox on Linux, older Safari) and
+// takes the whole page down before the fallback renderer can start. Define the
+// constant (values from the WebGPU spec) before any bundle runs. WebGPU support
+// is still detected through `navigator.gpu`, which this does not touch.
+const GPU_CONSTANTS_SHIM =
+  "if(typeof self.GPUShaderStage==='undefined'){self.GPUShaderStage={VERTEX:1,FRAGMENT:2,COMPUTE:4};}";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,6 +55,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: GPU_CONSTANTS_SHIM }} />
+      </head>
       <body className={`${inter.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>

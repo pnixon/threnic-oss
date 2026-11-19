@@ -198,6 +198,28 @@ fn fs() -> @location(0) vec4f {
 let _supportProbe: Promise<boolean> | null = null;
 
 /**
+ * The device the probe proved working, kept for the first renderer that asks.
+ *
+ * Browsers cap how many WebGPU devices a page may hold, and a destroyed device
+ * keeps counting until it is garbage collected. Firefox's cap is low enough
+ * that probe + preview + export devices together lost the export device with
+ * "Out of memory". Handing the probe's device on means one device fewer.
+ */
+let _probeDevice: GPUDevice | null = null;
+
+/**
+ * Take ownership of the probe's device, if it is still waiting and alive. It
+ * was requested with the adapter's maximum `maxTextureDimension2D`, the same
+ * descriptor the stage renderer uses. Returns null once taken; the caller owns
+ * (and eventually destroys) the device it gets.
+ */
+export function takeProbeDevice(): GPUDevice | null {
+  const device = _probeDevice;
+  _probeDevice = null;
+  return device;
+}
+
+/**
  * Run the actual device-level smoke test. Never throws; any failure resolves
  * to `false` so the caller engages the non-WebGPU (Canvas2D/WebGL) fallback.
  */
@@ -297,6 +319,14 @@ async function probeWebGPUDevice(): Promise<boolean> {
     }
     _lastSupported = true;
     _lastReason = 'WebGPU is fully supported and hardware-accelerated rendering is active.';
+    // Keep the proven device for the first renderer instead of destroying it
+    // (see takeProbeDevice). `device = null` stops the `finally` below.
+    const proven = device;
+    _probeDevice = proven;
+    proven.lost.then(() => {
+      if (_probeDevice === proven) _probeDevice = null;
+    });
+    device = null;
     return true;
   } catch (err) {
     _lastSupported = false;
@@ -343,4 +373,11 @@ export function checkWebGPUSupport(): Promise<boolean> {
  */
 export function resetWebGPUSupportCache(): void {
   _supportProbe = null;
+  // A probe device nobody took would otherwise sit there counting against the
+  // device limit while the next probe makes another.
+  try {
+    takeProbeDevice()?.destroy();
+  } catch {
+    /* already gone */
+  }
 }

@@ -14,6 +14,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   checkWebGPUSupport,
   resetWebGPUSupportCache,
+  takeProbeDevice,
   getWebGPUDiagnostics,
   isCompatibilityModeForced,
   setCompatibilityModeForced,
@@ -176,7 +177,7 @@ describe('checkWebGPUSupport (deep probe)', () => {
     expect(await checkWebGPUSupport()).toBe(false);
   });
 
-  it('returns true when the full smoke test succeeds, and destroys the throwaway device', async () => {
+  it('returns true when the full smoke test succeeds, and keeps the device for the first renderer', async () => {
     const { device, destroy } = makeMockDevice();
     const adapter = {
       limits: { maxTextureDimension2D: 16384 },
@@ -189,9 +190,22 @@ describe('checkWebGPUSupport (deep probe)', () => {
     expect(adapter.requestDevice).toHaveBeenCalledWith({
       requiredLimits: { maxTextureDimension2D: 16384 },
     });
-    // The throwaway device must be released so it never competes with the
-    // real renderer's device.
+    // The proven device is handed to the first renderer rather than destroyed:
+    // a second device would count against the browser's per-page limit.
+    expect(destroy).not.toHaveBeenCalled();
+    expect(takeProbeDevice()).toBe(device);
+    // Only one renderer gets it.
+    expect(takeProbeDevice()).toBeNull();
+  });
+
+  it('destroys a device nobody took when the probe is reset', async () => {
+    const { device, destroy } = makeMockDevice();
+    installNavigatorGpu(makeHealthyAdapter(device));
+
+    expect(await checkWebGPUSupport()).toBe(true);
+    resetWebGPUSupportCache();
     expect(destroy).toHaveBeenCalled();
+    expect(takeProbeDevice()).toBeNull();
   });
 
   it('memoizes the verdict — the adapter is probed only once across callers', async () => {

@@ -67,8 +67,10 @@ report problems at <https://github.com/pnixon/threnic-oss/issues>.
 
 ## Browser support
 
-Chrome and Edge are fully supported, including export. Firefox and Safari can
-preview but cannot export.
+Chrome and Edge are fully supported. GPU effects need WebGPU; a browser without
+it (Firefox on Linux, older Safari) runs the compatibility renderer, which
+shows lyrics and backgrounds but skips the effects. Export works there too,
+including in Firefox, with Opus audio.
 
 ## License
 

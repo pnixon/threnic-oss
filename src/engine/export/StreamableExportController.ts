@@ -1,3 +1,4 @@
+import { repairAvcDescription } from './avcDescription';
 import { type CodecKey } from '@/types/export';
 import {
   negotiateVideoCodec,
@@ -298,6 +299,25 @@ export class StreamableExportController {
     this.muxer = null;
   }
 
+  /**
+   * Firefox's H.264 encoder hands out a malformed avcC record; swap in a
+   * corrected one before it is written into the file (see avcDescription.ts).
+   */
+  private repairVideoMeta(
+    meta: EncodedVideoChunkMetadata | undefined,
+    packetData: Uint8Array,
+  ): EncodedVideoChunkMetadata | undefined {
+    const config = meta?.decoderConfig;
+    const description = config?.description;
+    if (!config || !description || !config.codec.startsWith('avc')) return meta;
+    const bytes = ArrayBuffer.isView(description)
+      ? new Uint8Array(description.buffer, description.byteOffset, description.byteLength)
+      : new Uint8Array(description);
+    const repaired = repairAvcDescription(bytes, packetData);
+    if (!repaired) return meta;
+    return { ...meta, decoderConfig: { ...config, description: repaired } };
+  }
+
   private handleVideoChunk(chunk: EncodedVideoChunk, meta?: EncodedVideoChunkMetadata): void {
     this.writeQueue.push({ type: 'video', chunk, meta });
     this.processQueue();
@@ -325,7 +345,10 @@ export class StreamableExportController {
       try {
         if (item.type === 'video' && this.videoSource) {
           const packet = EncodedPacket.fromEncodedChunk(item.chunk as EncodedVideoChunk);
-          await this.videoSource.add(packet, item.meta as EncodedVideoChunkMetadata);
+          await this.videoSource.add(
+            packet,
+            this.repairVideoMeta(item.meta as EncodedVideoChunkMetadata | undefined, packet.data),
+          );
         } else if (item.type === 'audio' && this.audioSource) {
           const packet = EncodedPacket.fromEncodedChunk(item.chunk as EncodedAudioChunk);
           await this.audioSource.add(packet, item.meta as EncodedAudioChunkMetadata);

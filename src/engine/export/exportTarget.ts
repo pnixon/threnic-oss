@@ -246,10 +246,13 @@ export async function acquireExportTarget(
   // This is what makes long / 4K exports viable on Firefox. Request storage
   // persistence so the browser is less likely to evict the temp file under
   // quota pressure mid-encode (best-effort — a denial is non-fatal).
+  // Do NOT await it: Firefox answers persist() with a permission prompt and
+  // leaves the promise pending until the user responds, so awaiting here made
+  // "Begin Export" do nothing at all while the prompt sat unanswered.
   if (supportsOPFS()) {
     try {
       if (typeof navigator.storage.persist === 'function') {
-        await navigator.storage.persist().catch(() => false);
+        void navigator.storage.persist().catch(() => false);
       }
       const writableStream = await makeOpfsStream(suggestedName, mimeType);
       return { writableStream, directToDisk: true, sink: 'opfs' };

@@ -648,7 +648,7 @@ export class WebGPURenderer {
       return false;
     }
 
-    const { requestHighPerformanceAdapter } = await import('./webgpu-support');
+    const { requestHighPerformanceAdapter, takeProbeDevice } = await import('./webgpu-support');
     const adapter = await requestHighPerformanceAdapter('WebGPURenderer');
 
     if (!adapter) {
@@ -661,10 +661,16 @@ export class WebGPURenderer {
     // limit is 8192, which a 13440-tall portrait target exceeds, causing every
     // render-target texture to fail creation and the canvas to render black.
     // Most desktop adapters advertise 16384; fall back to the default if not.
+    //
+    // Reuse the support probe's device when it is still waiting (it was
+    // requested with this same descriptor): every extra device counts against
+    // the browser's per-page limit, which Firefox reaches quickly.
     const maxDim = adapter.limits?.maxTextureDimension2D ?? 8192;
-    this.device = await adapter.requestDevice({
-      requiredLimits: { maxTextureDimension2D: maxDim },
-    });
+    this.device =
+      takeProbeDevice() ??
+      (await adapter.requestDevice({
+        requiredLimits: { maxTextureDimension2D: maxDim },
+      }));
     this.device.lost.then((info) => {
       // 'destroyed' = we tore it down on purpose. Anything else (driver reset,
       // GPU process crash, mobile memory pressure) lets the owner recover.
