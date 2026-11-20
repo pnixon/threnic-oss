@@ -27,6 +27,10 @@ const eslintConfig = defineConfig([
     'test/**',
     'scripts/**',
     '**/dist/**',
+    'playwright-report/**',
+    'playwright-report-gpu/**',
+    'test-results/**',
+    'tools/wgsl-compat/target/**',
   ]),
 ]);
 

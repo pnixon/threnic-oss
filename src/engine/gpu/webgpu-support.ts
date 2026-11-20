@@ -1,6 +1,18 @@
 /**
  * WebGPU Support Detection & Adapter Utilities
+ *
+ * Three ways to render, tried in this order:
+ *   1. the browser's WebGPU,
+ *   2. the WebGL2 compatibility backend (./compat) — the same renderers and
+ *      shaders running on WebGL2, for browsers without (working) WebGPU,
+ *   3. the Canvas2D software renderer (lyrics and backgrounds only).
+ * "Supported" below means 1 or 2: the full GPU renderer can run.
  */
+
+import { getCompatGPU, getGPU, setGPUBackend } from './compat';
+
+/** What the app is rendering with. */
+export type RenderBackend = 'webgpu' | 'webgl2' | 'canvas2d';
 
 /** Captured GPU adapter details, surfaced to the diagnostics readout. */
 interface AdapterInfo {
@@ -12,8 +24,10 @@ interface AdapterInfo {
 
 /** Snapshot of the last support probe, for the hardware-info readout. */
 export interface WebGPUDiagnostics {
-  /** true = WebGPU usable, false = fallback engaged, null = not probed yet. */
+  /** true = GPU renderer usable, false = Canvas2D fallback, null = not probed yet. */
   supported: boolean | null;
+  /** Which renderer the probe selected; null = not probed yet. */
+  backend: RenderBackend | null;
   /** Why the probe landed where it did (human-readable, one line). */
   reason: string;
   /** Adapter details when an adapter was obtained, else null. */
@@ -25,12 +39,14 @@ export interface WebGPUDiagnostics {
 // Mutable snapshot updated by the probe / adapter logger.
 let _lastAdapterInfo: AdapterInfo | null = null;
 let _lastSupported: boolean | null = null;
+let _lastBackend: RenderBackend | null = null;
 let _lastReason = 'Hardware not yet detected.';
 
 /** Read the latest diagnostics captured by the support probe. */
 export function getWebGPUDiagnostics(): WebGPUDiagnostics {
   return {
     supported: _lastSupported,
+    backend: _lastBackend,
     reason: _lastReason,
     adapter: _lastAdapterInfo,
     forcedCompatibility: isCompatibilityModeForced(),
@@ -40,7 +56,7 @@ export function getWebGPUDiagnostics(): WebGPUDiagnostics {
 // ── Persisted "compatibility mode" (force the non-WebGPU fallback) ──────
 const COMPAT_MODE_KEY = 'threnic_force_compatibility';
 
-/** Whether the user has pinned the app to the Canvas2D/WebGL fallback. */
+/** Whether the user has pinned the app to the WebGL2 compatibility backend. */
 export function isCompatibilityModeForced(): boolean {
   if (typeof localStorage === 'undefined') return false;
   try {
@@ -149,8 +165,10 @@ function logAdapterInfo(label: string, adapter: GPUAdapter): void {
  * this correctly and the hint is critical for selecting the discrete
  * GPU over integrated graphics.
  */
-export async function requestHighPerformanceAdapter(label: string): Promise<GPUAdapter | null> {
-  const gpu = navigator.gpu;
+export async function requestHighPerformanceAdapter(
+  label: string,
+  gpu: GPU | null = getGPU(),
+): Promise<GPUAdapter | null> {
   if (!gpu) return null;
 
   // Always try high-performance first
@@ -220,30 +238,19 @@ export function takeProbeDevice(): GPUDevice | null {
 }
 
 /**
- * Run the actual device-level smoke test. Never throws; any failure resolves
- * to `false` so the caller engages the non-WebGPU (Canvas2D/WebGL) fallback.
+ * Smoke-test one `GPU` implementation: create a device, compile a trivial
+ * shader, build a pipeline and submit one draw. Never throws. On success the
+ * proven device is returned for the first renderer to reuse.
  */
-async function probeWebGPUDevice(): Promise<boolean> {
-  // User pinned to the fallback renderer — skip the probe entirely.
-  if (isCompatibilityModeForced()) {
-    _lastSupported = false;
-    _lastReason = 'Compatibility mode is ON — using the fallback renderer by choice.';
-    return false;
-  }
-
-  if (typeof navigator === 'undefined' || !navigator.gpu) {
-    _lastSupported = false;
-    _lastReason = 'WebGPU is not available in this browser (navigator.gpu missing).';
-    return false;
-  }
-
+async function smokeTest(
+  gpu: GPU,
+  label: string,
+): Promise<{ ok: true; device: GPUDevice } | { ok: false; reason: string }> {
   let device: GPUDevice | null = null;
   try {
-    const adapter = await requestHighPerformanceAdapter('WebGPU-Support-Check');
+    const adapter = await requestHighPerformanceAdapter(label, gpu);
     if (!adapter) {
-      _lastSupported = false;
-      _lastReason = 'No WebGPU adapter — the GPU/driver is unsupported or blocklisted.';
-      return false;
+      return { ok: false, reason: 'no adapter — the GPU/driver is unsupported or blocklisted' };
     }
 
     // Mirror WebGPURenderer.init(): request the adapter's real max texture
@@ -264,9 +271,10 @@ async function probeWebGPUDevice(): Promise<boolean> {
 
     // Compile a trivial shader, build a render pipeline, and submit one draw
     // into a 1×1 offscreen target. This is the smallest end-to-end exercise of
-    // the pipeline that a partial WebGPU implementation can still fail on.
+    // the pipeline that a partial implementation can still fail on.
+    device.pushErrorScope('validation');
     const shaderModule = device.createShaderModule({ code: PROBE_WGSL });
-    const format = navigator.gpu.getPreferredCanvasFormat();
+    const format = gpu.getPreferredCanvasFormat();
     const pipeline = device.createRenderPipeline({
       layout: 'auto',
       vertex: { module: shaderModule, entryPoint: 'vs' },
@@ -296,9 +304,8 @@ async function probeWebGPUDevice(): Promise<boolean> {
     pass.end();
     device.queue.submit([encoder.finish()]);
 
-    // Surface a GPUValidationError raised by the submission above (some
-    // drivers only report the failure asynchronously via the error scope).
-    device.pushErrorScope('validation');
+    // Surface a GPUValidationError raised by anything above (some drivers only
+    // report the failure asynchronously via the error scope).
     const validationError = await device.popErrorScope();
     // Give any synchronous device-lost a microtask to land.
     await device.queue.onSubmittedWorkDone().catch(() => {
@@ -308,42 +315,86 @@ async function probeWebGPUDevice(): Promise<boolean> {
     target.destroy();
 
     if (validationError || deviceLost) {
-      _lastSupported = false;
-      _lastReason = deviceLost
-        ? 'Adapter present but the GPU device was lost during the smoke test.'
-        : 'Adapter present but the render smoke test failed validation.';
-      console.warn(
-        '[WebGPU-Support-Check] Adapter present but device smoke test failed — using fallback renderer.',
-      );
-      return false;
+      return {
+        ok: false,
+        reason: deviceLost
+          ? 'the GPU device was lost during the smoke test'
+          : 'the render smoke test failed validation',
+      };
     }
-    _lastSupported = true;
-    _lastReason = 'WebGPU is fully supported and hardware-accelerated rendering is active.';
-    // Keep the proven device for the first renderer instead of destroying it
-    // (see takeProbeDevice). `device = null` stops the `finally` below.
     const proven = device;
-    _probeDevice = proven;
-    proven.lost.then(() => {
-      if (_probeDevice === proven) _probeDevice = null;
-    });
     device = null;
-    return true;
+    return { ok: true, device: proven };
   } catch (err) {
-    _lastSupported = false;
-    _lastReason = `WebGPU initialization threw during the smoke test${
-      err instanceof Error ? `: ${err.message}` : ''
-    }.`;
-    console.warn('[WebGPU-Support-Check] Deep probe threw — using fallback renderer.', err);
-    return false;
+    return {
+      ok: false,
+      reason: `initialization threw during the smoke test${
+        err instanceof Error ? `: ${err.message}` : ''
+      }`,
+    };
   } finally {
-    // The probe owns this throwaway device; release it so it never competes
-    // with the real renderer's device.
+    // A failed probe owns its throwaway device; release it so it never
+    // competes with the real renderer's device.
     try {
       device?.destroy();
     } catch {
       /* already gone */
     }
   }
+}
+
+/** Keep a proven device for the first renderer (see takeProbeDevice). */
+function keepProbeDevice(device: GPUDevice): void {
+  _probeDevice = device;
+  device.lost.then(() => {
+    if (_probeDevice === device) _probeDevice = null;
+  });
+}
+
+/**
+ * Pick the renderer: WebGPU, else the WebGL2 compatibility backend, else
+ * (returning false) the Canvas2D software renderer. Never throws.
+ */
+async function probeWebGPUDevice(): Promise<boolean> {
+  const forced = isCompatibilityModeForced();
+  const nativeGPU = typeof navigator !== 'undefined' ? (navigator.gpu ?? null) : null;
+
+  let whyNotNative: string;
+  if (forced) {
+    whyNotNative = 'Compatibility mode is ON.';
+  } else if (!nativeGPU) {
+    whyNotNative = 'WebGPU is not available in this browser.';
+  } else {
+    setGPUBackend('webgpu');
+    const native = await smokeTest(nativeGPU, 'WebGPU-Support-Check');
+    if (native.ok) {
+      _lastSupported = true;
+      _lastBackend = 'webgpu';
+      _lastReason = 'WebGPU is fully supported and hardware-accelerated rendering is active.';
+      keepProbeDevice(native.device);
+      return true;
+    }
+    whyNotNative = `WebGPU is present but unusable (${native.reason}).`;
+    console.warn(`[WebGPU-Support-Check] ${whyNotNative} Trying the WebGL2 backend.`);
+  }
+
+  // Same renderers, same shaders, on WebGL2.
+  setGPUBackend('webgl2');
+  const compat = await smokeTest(getCompatGPU(), 'WebGL2-Compat-Check');
+  if (compat.ok) {
+    _lastSupported = true;
+    _lastBackend = 'webgl2';
+    _lastReason = `${whyNotNative} Rendering with the WebGL2 compatibility backend; all effects are available.`;
+    keepProbeDevice(compat.device);
+    return true;
+  }
+
+  setGPUBackend('webgpu');
+  _lastSupported = false;
+  _lastBackend = 'canvas2d';
+  _lastReason = `${whyNotNative} The WebGL2 backend is unavailable too (${compat.reason}), so the basic Canvas2D renderer is in use: lyrics and backgrounds only.`;
+  console.warn(`[WebGPU-Support-Check] ${_lastReason}`);
+  return false;
 }
 
 /**

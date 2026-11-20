@@ -27,6 +27,7 @@
     "test:quick": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:gpu": "playwright test -c playwright.gpu.config.ts",
     "validate:milkdrop": "node scripts/validate-milkdrop-wgsl.mjs",
     "prepare": "husky",
     "docker:verify": "node scripts/verify-docker-build.mjs"

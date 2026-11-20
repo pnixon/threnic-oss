@@ -1,7 +1,8 @@
 /**
  * effectAvailability — which effects can actually render on the current stage.
  *
- * Effects run in the WebGPU RenderGraph. On the fallback stage (no WebGPU:
+ * Effects run in the GPU RenderGraph (on WebGPU, or on WebGL2 through the
+ * compatibility backend). On the fallback stage (neither available:
  * CenterStage, or the Canvas2D software renderer) only a handful of
  * background-level properties are applied; everything else silently did
  * nothing. The effects list uses this to disable those rows with a reason.
@@ -22,11 +23,11 @@ const FALLBACK_SUPPORTED_EFFECTS: ReadonlySet<string> = new Set([
 ]);
 
 /** Short label shown on unavailable rows. */
-export const NEEDS_WEBGPU_LABEL = 'Needs WebGPU';
+export const NEEDS_WEBGPU_LABEL = 'Needs GPU';
 
 /** Tooltip explaining why the row is disabled. */
 const NEEDS_WEBGPU_REASON =
-  "Needs WebGPU, which isn't available on this device/browser — this effect won't render.";
+  "Needs WebGPU or WebGL2, neither of which is available on this device/browser — this effect won't render.";
 
 /**
  * Reason an effect type can't render on the given stage pipeline, or null when

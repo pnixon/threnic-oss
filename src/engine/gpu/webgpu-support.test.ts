@@ -264,7 +264,8 @@ describe('checkWebGPUSupport (deep probe)', () => {
     expect(await checkWebGPUSupport()).toBe(false);
     const diag = getWebGPUDiagnostics();
     expect(diag.supported).toBe(false);
-    expect(diag.reason).toMatch(/no webgpu adapter/i);
+    expect(diag.backend).toBe('canvas2d');
+    expect(diag.reason).toMatch(/no adapter/i);
   });
 });
 

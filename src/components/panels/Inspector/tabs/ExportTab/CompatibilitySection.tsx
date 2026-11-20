@@ -3,13 +3,13 @@
  *
  * Two things live here, both global (per-browser) preferences:
  *
- *   1. A persisted "Compatibility mode" toggle that pins the app to the
- *      Canvas2D/WebGL fallback renderer instead of WebGPU. Useful on hardware
- *      where WebGPU is flaky (old Linux/Mesa) — the user forces the stable
- *      path without editing the ?webgl=1 URL param.
+ *   1. A persisted "Compatibility mode" toggle that pins the app to the WebGL2
+ *      compatibility backend instead of WebGPU. Useful on hardware where
+ *      WebGPU is flaky (old Linux/Mesa): every effect still works, on the
+ *      older, more widely supported graphics API.
  *
  *   2. A hardware-info readout showing what the startup probe actually found
- *      (WebGPU active / fallback + why, adapter vendor/architecture/backend),
+ *      (WebGPU / WebGL2 / basic renderer + why, adapter vendor/architecture),
  *      turning a silent "it didn't render" into a reportable state.
  *
  * Self-contained: it reads the diagnostics snapshot and drives localStorage
@@ -61,8 +61,7 @@ export function CompatibilitySection(): React.ReactElement {
     window.location.reload();
   }, []);
 
-  const supported = diag?.supported ?? null;
-  const active = forced ? false : supported;
+  const backend = diag?.backend ?? null;
 
   const labelStyle: React.CSSProperties = {
     fontSize: '11px',
@@ -101,7 +100,7 @@ export function CompatibilitySection(): React.ReactElement {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '12px', fontWeight: 600 }}>Compatibility mode</span>
             <span style={{ ...labelStyle, fontSize: '10px' }}>
-              Force the fallback renderer (fixes black canvas on old GPUs)
+              Use WebGL2 instead of WebGPU (fixes black canvas on some GPUs)
             </span>
           </div>
         </div>
@@ -130,17 +129,19 @@ export function CompatibilitySection(): React.ReactElement {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {active === true ? (
+          {backend === 'webgpu' || backend === 'webgl2' ? (
             <MonitorCheck size={14} style={{ color: '#10b981' }} />
           ) : (
-            <MonitorX size={14} style={{ color: active === null ? '#94a3b8' : '#f59e0b' }} />
+            <MonitorX size={14} style={{ color: backend === null ? '#94a3b8' : '#f59e0b' }} />
           )}
           <span style={{ fontSize: '12px', fontWeight: 600 }}>
-            {active === null
+            {backend === null
               ? 'Detecting hardware…'
-              : active
+              : backend === 'webgpu'
                 ? 'WebGPU — hardware accelerated'
-                : 'Compatibility renderer (WebGL/Canvas2D)'}
+                : backend === 'webgl2'
+                  ? 'WebGL2 compatibility backend — hardware accelerated'
+                  : 'Basic renderer (Canvas2D) — lyrics and backgrounds only'}
           </span>
         </div>
 

@@ -727,6 +727,16 @@ export class LyricFXGraph {
   ): GPUTextureView | null {
     if (!this.targetView || !this.glyphBuffer || this.glyphCount === 0) return this.targetView;
 
+    // Glyphs are laid out in project pixels (`frame.resolution`), which is not
+    // always the size of the target: the preview renders at the on-screen
+    // size. Map layout pixels onto the whole target, whatever its size —
+    // otherwise lyrics are drawn at project scale and fall off a smaller canvas.
+    this.device.queue.writeBuffer(
+      this.viewportBuffer,
+      0,
+      new Float32Array([frame.resolution[0], frame.resolution[1], 0, 0]),
+    );
+
     // `layerBelow` (refraction source) MUST be a sampleable view. Callers pass
     // the bindable background intermediate; when absent, fall back to the pong
     // target (bindable, and NOT the surface pass's render target — avoids a

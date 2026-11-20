@@ -95,6 +95,7 @@ renderer/build/
 # scratch / test / hygiene artifacts (should never be tracked)
 scratch/
 playwright-report/
+playwright-report-gpu/
 .npm/
 wiki/log.md
 

@@ -48,6 +48,7 @@ import { BG_IMAGE_OVERLAY_PASS_ID, setOverlayImageMeta } from './BgImageOverlayP
 import { loadEffectImageBlob } from '@/engine/gpu/effectImageAssets';
 import type { EffectsConfig } from '@/types/effects';
 import type { IExportRenderer, FrameState } from './IExportRenderer';
+import { getGPU } from './compat';
 
 // ---------------------------------------------------------------------------
 // WGSL shader — identical to preview renderer
@@ -354,7 +355,7 @@ export class OffscreenGPURenderer implements IExportRenderer {
   async init(): Promise<boolean> {
     if (this._initialized) return true;
 
-    const gpu = navigator.gpu;
+    const gpu = getGPU();
     if (!gpu) {
       console.error('[OffscreenGPURenderer] WebGPU not supported.');
       return false;

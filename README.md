@@ -35,6 +35,7 @@ path redirects there). Node.js 20 or newer is required (see `.nvmrc`).
 | `npm test`           | Run the unit tests and write a report |
 | `npm run test:quick` | Run the unit tests (Vitest)           |
 | `npm run test:e2e`   | Run the Playwright end-to-end tests   |
+| `npm run test:gpu`   | Run the cross-browser rendering tests |
 | `npm run lint`       | Run ESLint                            |
 | `npm run format`     | Format the codebase with Prettier     |
 
@@ -67,10 +68,16 @@ report problems at <https://github.com/pnixon/threnic-oss/issues>.
 
 ## Browser support
 
-Chrome and Edge are fully supported. GPU effects need WebGPU; a browser without
-it (Firefox on Linux, older Safari) runs the compatibility renderer, which
-shows lyrics and backgrounds but skips the effects. Export works there too,
-including in Firefox, with Opus audio.
+Threnic renders with WebGPU where the browser has it (Chrome and Edge, and
+other browsers as they ship it). Where it does not (for example Firefox on
+Linux and Android), the same renderer runs on WebGL2 through a built-in
+compatibility backend, so every effect, visualizer and lyric effect is still
+available. The badge in the header shows which one is active, and "Compatibility
+mode" in the Export tab forces WebGL2 if WebGPU misbehaves on your hardware.
+
+Export needs the browser's video encoder (WebCodecs). Chrome, Edge and desktop
+Firefox have one; Firefox for Android does not, so it can preview but not
+export.
 
 ## License
 

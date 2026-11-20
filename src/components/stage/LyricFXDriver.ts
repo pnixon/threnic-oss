@@ -33,6 +33,7 @@ import { DEFAULT_AUDIO_REACTIVE } from '@/types/effects/audio-reactive';
 import type { AudioRoutingTable } from '@/types/effects/audio-routing';
 import type { LyricEffectInstance, LyricFXFrameParams } from '@/types/effects/lyric-fx';
 import type { LyricLineData, LyricTheme } from '@/types/lyrics';
+import { getGPU } from '@/engine/gpu/compat';
 
 /** Minimal renderer surface the driver needs (both WebGPU + Offscreen satisfy). */
 interface LyricFXCapableRenderer {
@@ -216,7 +217,7 @@ export class LyricFXDriver {
     });
 
     // Preferred swapchain format for the composite target.
-    const format = navigator.gpu?.getPreferredCanvasFormat?.() ?? 'bgra8unorm';
+    const format = getGPU()?.getPreferredCanvasFormat?.() ?? 'bgra8unorm';
     this.graph?.destroy();
     this.graph = new LyricFXGraph(
       this.device,

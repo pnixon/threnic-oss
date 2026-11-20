@@ -1,0 +1,23 @@
+{
+  "shatter": false,
+  "kineticWave": false,
+  "scatterAssemble": false,
+  "springSettle": false,
+  "vortex": false,
+  "impactTypewriter": false,
+  "glyphJitter": false,
+  "cardFlip": false,
+  "swell": false,
+  "melt": true,
+  "dissolve": false,
+  "gradientFill": false,
+  "chromaticSplit": false,
+  "marchingOutline": false,
+  "bevel": false,
+  "neonCore": false,
+  "refraction": false,
+  "textBloom": false,
+  "motionTrails": false,
+  "displace": false,
+  "lightRays": false
+}

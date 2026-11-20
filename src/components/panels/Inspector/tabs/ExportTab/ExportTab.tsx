@@ -142,6 +142,14 @@ export function ExportTab({
     h264: true,
   });
 
+  // Whether this browser can encode video at all. Firefox for Android has no
+  // WebCodecs; say so up front instead of failing when Export is pressed.
+  // null until mounted, so the server render and first paint agree.
+  const [canEncodeVideo, setCanEncodeVideo] = useState<boolean | null>(null);
+  useEffect(() => {
+    setCanEncodeVideo(typeof window !== 'undefined' && 'VideoEncoder' in window);
+  }, []);
+
   // Probe hardware codec support on mount/load
   useEffect(() => {
     let active = true;
@@ -435,8 +443,8 @@ export function ExportTab({
       if (err instanceof ExportTargetAborted) return;
       if (err instanceof ExportUnsupported) {
         toast.error(
-          'Video export needs the WebCodecs API, which this browser does not support. ' +
-            'Please use a current version of Chrome, Edge, or Firefox.',
+          'This browser cannot export video (it has no WebCodecs video encoder). ' +
+            'Open your project in Chrome or Edge, or in Firefox on a computer.',
         );
         return;
       }
@@ -1121,6 +1129,16 @@ export function ExportTab({
           </div>
         ) : (
           <div className={styles.exportActions}>
+            {canEncodeVideo === false && (
+              <div className={styles.warningBox} data-testid="export-unsupported-notice">
+                <AlertCircle size={12} className={styles.warningIcon} />
+                <span>
+                  This browser cannot export video: it has no video encoder (WebCodecs). The preview
+                  and all effects still work here. To export, open your project in Chrome or Edge,
+                  or in Firefox on a computer.
+                </span>
+              </div>
+            )}
             <div className={styles.warningBox}>
               <AlertCircle size={12} className={styles.warningIcon} />
               <span>
@@ -1136,11 +1154,13 @@ export function ExportTab({
             <button
               onClick={handleExport}
               disabled={
-                config.mode === 'selection'
-                  ? !config.selectionRange || !selectedTrack
-                  : config.mode === 'batch'
-                    ? !selectedTrack
-                    : config.tracks.length === 0
+                canEncodeVideo === false
+                  ? true
+                  : config.mode === 'selection'
+                    ? !config.selectionRange || !selectedTrack
+                    : config.mode === 'batch'
+                      ? !selectedTrack
+                      : config.tracks.length === 0
               }
               className={`${styles.exportBtn} ${
                 (

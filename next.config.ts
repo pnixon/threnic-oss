@@ -31,8 +31,9 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               // Next injects an inline bootstrap without a nonce; 'unsafe-eval'
-              // is only needed by the dev/Turbopack runtime.
-              `script-src 'self' 'unsafe-inline'${
+              // is only needed by the dev/Turbopack runtime. 'wasm-unsafe-eval'
+              // lets the WebGL2 backend compile its WGSL translator (WebAssembly).
+              `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${
                 process.env.NODE_ENV !== 'production' ? " 'unsafe-eval'" : ''
               }`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",

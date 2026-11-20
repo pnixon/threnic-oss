@@ -35,3 +35,11 @@ vitest.json
 
 # Local agent tooling and worktrees
 .claude/
+
+# Test output
+playwright-report/
+playwright-report-gpu/
+test-results/
+
+# Rust build output of the shader translator
+tools/wgsl-compat/target/

@@ -174,7 +174,7 @@ const SHADER_PALETTES: ShaderPalette[] = [
 
 // ─── Presets ────────────────────────────────────────────────
 
-const SHADER_PRESETS: ShaderPreset[] = [
+export const SHADER_PRESETS: ShaderPreset[] = [
   STAR_WARP_PRESET,
   CLOUD_FLIGHT_PRESET,
   VOLUMETRIC_CLOUDS_PRESET,

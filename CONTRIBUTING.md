@@ -19,17 +19,18 @@ pre-commit hook that formats staged files with Prettier (and runs a
 
 ## Useful scripts
 
-| Command                 | What it does                                 |
-| ----------------------- | -------------------------------------------- |
-| `npm run dev`           | Development server                           |
-| `npm run lint`          | ESLint                                       |
-| `npm run format`        | Format everything with Prettier              |
-| `npm run check-format`  | Check formatting without writing             |
-| `npm run test:quick`    | Unit tests (Vitest)                          |
-| `npm test`              | Unit tests plus a `test-results.md` report   |
-| `npm run test:e2e`      | Playwright end-to-end tests (`src/test/e2e`) |
-| `npm run build`         | Format check and production build            |
-| `npm run docker:verify` | Build the Docker image and check it starts   |
+| Command                 | What it does                                   |
+| ----------------------- | ---------------------------------------------- |
+| `npm run dev`           | Development server                             |
+| `npm run lint`          | ESLint                                         |
+| `npm run format`        | Format everything with Prettier                |
+| `npm run check-format`  | Check formatting without writing               |
+| `npm run test:quick`    | Unit tests (Vitest)                            |
+| `npm test`              | Unit tests plus a `test-results.md` report     |
+| `npm run test:e2e`      | Playwright end-to-end tests (`src/test/e2e`)   |
+| `npm run test:gpu`      | Cross-browser rendering tests (`src/test/gpu`) |
+| `npm run build`         | Format check and production build              |
+| `npm run docker:verify` | Build the Docker image and check it starts     |
 
 ## Tests
 
@@ -37,6 +38,37 @@ pre-commit hook that formats staged files with Prettier (and runs a
   with `npx vitest run`.
 - End-to-end tests live in `src/test/e2e` and need Chromium installed
   (`npx playwright install chromium`).
+- Rendering tests live in `src/test/gpu` and run every effect, visualizer preset
+  and lyric effect on three renderers: Chromium with WebGPU, Chromium on the
+  WebGL2 compatibility backend, and Firefox (WebGL2). They need a production
+  build and the browsers installed:
+
+  ```bash
+  npx playwright install chromium firefox
+  npm run build
+  npm run test:gpu
+  ```
+
+  On a machine with a graphics card, `GPU_E2E_HEADED=1 npm run test:gpu` uses it
+  (an off-screen window) instead of Chromium's software renderer. The WebGL2
+  results are compared with reference images recorded from real WebGPU, under
+  `src/test/gpu/goldens`. After an intentional change to how something looks,
+  re-record them and review the diff:
+
+  ```bash
+  GPU_E2E_HEADED=1 UPDATE_GPU_GOLDENS=1 npm run test:gpu -- --project=chrome-webgpu
+  ```
+
+- The WebGL2 backend translates the WGSL shaders with naga, built to
+  WebAssembly from `tools/wgsl-compat` into `public/compat/wgsl-compat.wasm`.
+  The binary is checked in; rebuild it only when changing that crate:
+
+  ```bash
+  cd tools/wgsl-compat
+  cargo build --release --target wasm32-unknown-unknown
+  cp target/wasm32-unknown-unknown/release/wgsl_compat.wasm ../../public/compat/wgsl-compat.wasm
+  ```
+
 - Add or update tests for behavior you change.
 
 ## Code style

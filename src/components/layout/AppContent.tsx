@@ -13,6 +13,8 @@ import { LyricsCanvas } from '@/components/stage/LyricsCanvas';
 import { PreviewWatermark } from '@/components/stage/overlays/PreviewWatermark';
 import { AudioPlayer } from '@/components/audio';
 import { checkWebGPUSupport } from '@/engine/gpu/webgpu-support';
+import { exposeGPUDebugHook } from '@/engine/gpu/compat';
+import { exposeTestHooks } from '@/engine/debugHooks';
 import { useExportMode } from '@/engine/export';
 
 import {
@@ -117,6 +119,8 @@ export function AppContent(): React.ReactElement {
   const [webGPUSupported, setWebGPUSupported] = useState<boolean | null>(null);
 
   useEffect(() => {
+    exposeGPUDebugHook();
+    exposeTestHooks();
     // Allow ?webgl=1 URL param to force WebGL fallback mode for debugging
     const forceWebGL = new URLSearchParams(window.location.search).get('webgl') === '1';
     if (forceWebGL) {

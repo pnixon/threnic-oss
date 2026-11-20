@@ -31,6 +31,7 @@ import type { MilkdropConfig } from '@/types/effects/milkdrop';
 import { BG_IMAGE_OVERLAY_PASS_ID, setOverlayImageMeta } from './BgImageOverlayPass';
 import { loadEffectImageBlob } from '@/engine/gpu/effectImageAssets';
 import type { EffectsConfig } from '@/types/effects';
+import { getGPU, getGPUCanvasContext } from './compat';
 
 // ---------------------------------------------------------------------------
 // Inline WGSL shader (avoids bundler config for .wgsl imports)
@@ -640,9 +641,9 @@ export class WebGPURenderer {
   async init(): Promise<boolean> {
     if (this._initialized) return true;
 
-    // This specific renderer is Native WebGPU ONLY.
-
-    const gpu = navigator.gpu;
+    // The browser's WebGPU, or the WebGL2 compatibility backend standing in
+    // for it — whichever the support probe selected.
+    const gpu = getGPU();
     if (!gpu) {
       console.error('[WebGPURenderer] WebGPU not supported in this browser.');
       return false;
@@ -680,7 +681,7 @@ export class WebGPURenderer {
     });
 
     // Configure canvas context
-    this.context = this.canvas.getContext('webgpu') as GPUCanvasContext;
+    this.context = getGPUCanvasContext(this.canvas) as GPUCanvasContext;
     this.format = gpu.getPreferredCanvasFormat();
     this.context.configure({
       device: this.device,

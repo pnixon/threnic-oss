@@ -1,0 +1,10 @@
+{
+  "starter-tint": true,
+  "grayscale": true,
+  "invert": true,
+  "vignette": true,
+  "pixelate": false,
+  "chromatic-split": false,
+  "edge-detect": true,
+  "scanlines": true
+}

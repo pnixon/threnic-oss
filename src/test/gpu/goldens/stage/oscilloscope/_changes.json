@@ -1,0 +1,10 @@
+{
+  "type-linear": false,
+  "type-circle": true,
+  "type-bars": true,
+  "type-tunnel": true,
+  "style-retro": false,
+  "style-modern": true,
+  "style-lasers": false,
+  "style-blocky": false
+}

@@ -110,7 +110,7 @@ describe('DraggableEffectList — flat layer stack', () => {
     expect(order.some((t) => t.kind === 'effect')).toBe(true);
   });
 
-  it('marks GPU-only effects "Needs WebGPU" on the fallback stage and blocks enabling them', () => {
+  it('marks GPU-only effects "Needs GPU" on the fallback stage and blocks enabling them', () => {
     systemStore.getState().setStagePipeline('fallback');
     const instances = [bloom('a', true)];
     const onChange = vi.fn();
@@ -120,7 +120,7 @@ describe('DraggableEffectList — flat layer stack', () => {
         onEffectsConfigChange={onChange}
       />,
     );
-    expect(getAllByText('Needs WebGPU').length).toBeGreaterThan(0);
+    expect(getAllByText('Needs GPU').length).toBeGreaterThan(0);
 
     const toggles = Array.from(
       container.querySelectorAll('button[role="switch"]'),
@@ -143,6 +143,6 @@ describe('DraggableEffectList — flat layer stack', () => {
         onEffectsConfigChange={() => {}}
       />,
     );
-    expect(queryAllByText('Needs WebGPU')).toHaveLength(0);
+    expect(queryAllByText('Needs GPU')).toHaveLength(0);
   });
 });

@@ -25,7 +25,11 @@ import { ASPECT_RATIOS, AspectKey } from '@/types/exportConstants';
 import { AboutModal, HelpModal } from '@/components/modals';
 import { useHelp, useTheme } from '@/contexts';
 import { useProjectIOAPI } from '@/contexts/PlaylistContext';
-import { checkWebGPUSupport } from '@/engine/gpu/webgpu-support';
+import {
+  checkWebGPUSupport,
+  getWebGPUDiagnostics,
+  type RenderBackend,
+} from '@/engine/gpu/webgpu-support';
 import {
   DropdownPanel,
   DropdownItem,
@@ -70,10 +74,10 @@ export function Header({ projectName = 'Untitled Project' }: HeaderProps): React
   const { theme, setTheme } = useTheme();
   const { exportCurrentProject, loadProjectFromManifest, convertProjectToManifest } =
     useProjectIOAPI();
-  const [webGPUSupported, setWebGPUSupported] = useState<boolean | null>(null);
+  const [renderBackend, setRenderBackend] = useState<RenderBackend | null>(null);
 
   useEffect(() => {
-    checkWebGPUSupport().then(setWebGPUSupported);
+    checkWebGPUSupport().then(() => setRenderBackend(getWebGPUDiagnostics().backend));
   }, []);
 
   // Keyboard shortcut: ? to open help
@@ -151,13 +155,27 @@ export function Header({ projectName = 'Untitled Project' }: HeaderProps): React
         <span>{projectName}</span>
       </div>
 
-      {webGPUSupported !== null && (
+      {renderBackend !== null && (
         <div
-          className={`${styles.gpuBadge} ${webGPUSupported ? styles.webgpu : styles.webgl}`}
-          title={webGPUSupported ? 'WebGPU Active' : 'WebGL Fallback Active'}
+          className={`${styles.gpuBadge} ${renderBackend === 'webgpu' ? styles.webgpu : styles.webgl}`}
+          data-testid="render-backend-badge"
+          data-backend={renderBackend}
+          title={
+            renderBackend === 'webgpu'
+              ? 'WebGPU active'
+              : renderBackend === 'webgl2'
+                ? 'WebGL2 compatibility backend active (all effects available)'
+                : 'Basic Canvas2D renderer active (lyrics and backgrounds only)'
+          }
         >
-          <Zap size={10} fill={webGPUSupported ? 'currentColor' : 'none'} />
-          <span className={styles.gpuBadgeText}>{webGPUSupported ? 'WebGPU' : 'WebGL'}</span>
+          <Zap size={10} fill={renderBackend === 'canvas2d' ? 'none' : 'currentColor'} />
+          <span className={styles.gpuBadgeText}>
+            {renderBackend === 'webgpu'
+              ? 'WebGPU'
+              : renderBackend === 'webgl2'
+                ? 'WebGL2'
+                : 'Basic'}
+          </span>
         </div>
       )}
 

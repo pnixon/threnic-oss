@@ -84,6 +84,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
 
+## naga shader translator — the wgpu project
+
+- **Authors:** The gfx-rs / wgpu developers
+- **Source:** https://github.com/gfx-rs/wgpu (the `naga` crate)
+- **License:** MIT OR Apache-2.0
+- **Used in:** `public/compat/wgsl-compat.wasm`, built from `tools/wgsl-compat`.
+  It translates Threnic's WGSL shaders to GLSL for the WebGL2 compatibility
+  backend. The binary also contains naga's Rust dependencies (including
+  `serde`, `serde_json`, `hashbrown`, `indexmap`, `bitflags`, `thiserror` and
+  the Rust standard library), each under MIT and/or Apache-2.0.
+
+---
+
 ## Bundled npm dependencies
 
 Threnic's browser bundle and its server-side render/tooling include
