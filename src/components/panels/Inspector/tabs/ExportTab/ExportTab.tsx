@@ -17,6 +17,13 @@ import {
   ExportUnsupported,
 } from '@/engine/export/exportTarget';
 import { AudioMixer } from '@/engine/export/AudioMixer';
+import {
+  chooseExportEngine,
+  detectEngineCaps,
+  pickRecorderFormat,
+  recorderFps,
+  type ExportEngine,
+} from '@/engine/export/exportEngine';
 import type { LyricLineData, LyricTheme } from '@/types/lyrics';
 import { toast } from '@/utils/toast';
 import { getFontUrl } from '@/constants/fonts';
@@ -81,6 +88,10 @@ interface ExportTabProps {
 // (EffectsSummarySection). It was moved out of Export so effect authoring and
 // its summary sit together.
 
+function recorderExtensionLabel(): string {
+  return pickRecorderFormat()?.extension === 'mp4' ? 'MP4' : 'WebM';
+}
+
 export function ExportTab({
   quality = 'High',
   onQualityChange,
@@ -142,13 +153,14 @@ export function ExportTab({
     h264: true,
   });
 
-  // Whether this browser can encode video at all. Firefox for Android has no
-  // WebCodecs; say so up front instead of failing when Export is pressed.
-  // null until mounted, so the server render and first paint agree.
-  const [canEncodeVideo, setCanEncodeVideo] = useState<boolean | null>(null);
+  // How this browser exports: offline with WebCodecs, in real time with
+  // MediaRecorder (Firefox for Android, Safari without AudioEncoder), or not at
+  // all. null until mounted, so the server render and first paint agree.
+  const [exportEngine, setExportEngine] = useState<ExportEngine | null>(null);
   useEffect(() => {
-    setCanEncodeVideo(typeof window !== 'undefined' && 'VideoEncoder' in window);
+    setExportEngine(chooseExportEngine(detectEngineCaps()));
   }, []);
+  const canEncodeVideo = exportEngine === null ? null : exportEngine !== 'none';
 
   // Probe hardware codec support on mount/load
   useEffect(() => {
@@ -408,6 +420,12 @@ export function ExportTab({
 
   // Merge decoupled + legacy export states for UI
   const combinedIsExporting = isExporting || isDecoupledExporting;
+  // The real-time recorder lowers the frame rate above 720p; show the real one.
+  const modalDims = calcDimensions(quality, aspect);
+  const modalFps =
+    exportEngine === 'recorder'
+      ? recorderFps(modalDims.width, modalDims.height, selectedFps)
+      : selectedFps;
 
   const handleExport = async () => {
     timeStore.getState().setIsPlaying(false);
@@ -437,8 +455,14 @@ export function ExportTab({
     //    Chromium streams direct-to-disk via the File System Access API;
     //    Firefox/Safari fall back to an in-memory buffer + Blob download.
     let exportTarget: Awaited<ReturnType<typeof acquireExportTarget>>;
+    let engine: ExportEngine = 'webcodecs';
     try {
-      exportTarget = await acquireExportTarget(suggestedName, 'video/mp4');
+      engine = chooseExportEngine(detectEngineCaps());
+      exportTarget = await acquireExportTarget(
+        suggestedName,
+        'video/mp4',
+        engine === 'recorder' ? 'recorder' : 'webcodecs',
+      );
     } catch (err) {
       if (err instanceof ExportTargetAborted) return;
       if (err instanceof ExportUnsupported) {
@@ -636,7 +660,7 @@ export function ExportTab({
         };
       }
 
-      const exporter = new DecoupledExporter(exportConfig);
+      const exporter = new DecoupledExporter({ ...exportConfig, engine });
       decoupledExporterRef.current = exporter;
 
       const result = await exporter.run(writableStream, (p) => {
@@ -645,11 +669,13 @@ export function ExportTab({
 
       if (result.success) {
         toast.success(
-          `Export complete! ${result.averageFps.toFixed(0)} fps avg ` +
-            `(${result.realtimeX.toFixed(1)}x real-time)` +
-            // Chromium wrote straight to the file the user picked; OPFS and the
-            // memory fallback both deliver as a browser download at the end.
-            (exportTarget.sink === 'file-system-access' ? '' : ' — check your downloads'),
+          engine === 'recorder'
+            ? 'Recording saved — check your downloads'
+            : `Export complete! ${result.averageFps.toFixed(0)} fps avg ` +
+                `(${result.realtimeX.toFixed(1)}x real-time)` +
+                // Chromium wrote straight to the file the user picked; OPFS and the
+                // memory fallback both deliver as a browser download at the end.
+                (exportTarget.sink === 'file-system-access' ? '' : ' — check your downloads'),
         );
       } else if (result.error && result.error !== 'Cancelled by user') {
         toast.error(`Export failed: ${result.error}`);
@@ -1129,6 +1155,17 @@ export function ExportTab({
           </div>
         ) : (
           <div className={styles.exportActions}>
+            {exportEngine === 'recorder' && (
+              <div className={styles.warningBox} data-testid="export-realtime-notice">
+                <AlertCircle size={12} className={styles.warningIcon} />
+                <span>
+                  This browser cannot encode video faster than real time, so the export is recorded
+                  live and takes as long as the video. Keep this tab open and in front until it
+                  finishes. The file is saved as {recorderExtensionLabel()}. Above 720p the frame
+                  rate is capped at 24 fps; 720p or lower gives the smoothest result on phones.
+                </span>
+              </div>
+            )}
             {canEncodeVideo === false && (
               <div className={styles.warningBox} data-testid="export-unsupported-notice">
                 <AlertCircle size={12} className={styles.warningIcon} />
@@ -1186,8 +1223,8 @@ export function ExportTab({
           progress={{
             currentFrame: decoupledProgress.currentFrame,
             totalFrames: decoupledProgress.totalFrames,
-            currentTime: decoupledProgress.currentFrame / selectedFps,
-            totalDuration: decoupledProgress.totalFrames / selectedFps,
+            currentTime: decoupledProgress.currentFrame / modalFps,
+            totalDuration: decoupledProgress.totalFrames / modalFps,
             percentage: decoupledProgress.percent,
             recentFps: decoupledProgress.fps,
             etaSeconds: decoupledProgress.etaSeconds,
@@ -1196,8 +1233,16 @@ export function ExportTab({
           }}
           onCancel={() => decoupledExporterRef.current?.cancel()}
           height={calcDimensions(quality, aspect).height}
-          fps={selectedFps}
-          codec={selectedCodec === 'h264' ? 'H.264' : selectedCodec === 'hevc' ? 'HEVC' : 'AV1'}
+          fps={modalFps}
+          codec={
+            exportEngine === 'recorder'
+              ? `${recorderExtensionLabel()} (live)`
+              : selectedCodec === 'h264'
+                ? 'H.264'
+                : selectedCodec === 'hevc'
+                  ? 'HEVC'
+                  : 'AV1'
+          }
         />
       )}
     </div>

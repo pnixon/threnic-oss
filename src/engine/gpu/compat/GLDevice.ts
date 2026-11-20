@@ -75,6 +75,74 @@ function formatInfo(gl: GL, format: string): FormatInfo {
       throw new Error(`[compat] unsupported texture format: ${format}`);
   }
 }
+/**
+ * Capabilities to pretend are missing, from `localStorage.threnic_gl_disable`
+ * (comma separated: float32, float16). Lets the tests exercise the fallbacks
+ * that older Mac GPUs take.
+ */
+function disabledCapabilities(): Set<string> {
+  try {
+    const raw =
+      typeof localStorage === 'undefined' ? null : localStorage.getItem('threnic_gl_disable');
+    return new Set(
+      (raw ?? '')
+        .split(',')
+        .map((x) => x.trim())
+        .filter(Boolean),
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+export interface FloatTargetCaps {
+  float32: boolean;
+  float16: boolean;
+}
+
+/**
+ * Which float formats can be rendered into. Meant for a throwaway context: the
+ * probe leaves driver state behind that has broken float rendering on some
+ * drivers, so the live context never runs it.
+ */
+export function probeFloatTargets(gl: GL): FloatTargetCaps {
+  const disabled = disabledCapabilities();
+  gl.getExtension('EXT_color_buffer_float');
+  gl.getExtension('EXT_color_buffer_half_float');
+  const float32 = !disabled.has('float32') && probeRenderable(gl, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+  const float16 =
+    !disabled.has('float16') &&
+    (float32 || probeRenderable(gl, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT));
+  return { float32, float16 };
+}
+
+/** True if a texture of this format can be the colour attachment of a complete framebuffer. */
+function probeRenderable(gl: GL, internal: number, format: number, type: number): boolean {
+  const tex = gl.createTexture();
+  const fbo = gl.createFramebuffer();
+  let ok = false;
+  try {
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internal, 4, 4, 0, format, type, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    ok =
+      gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE &&
+      gl.getError() === gl.NO_ERROR;
+  } catch {
+    ok = false;
+  } finally {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.deleteFramebuffer(fbo);
+    gl.deleteTexture(tex);
+    while (gl.getError() !== gl.NO_ERROR) {
+      /* drain */
+    }
+  }
+  return ok;
+}
+
 function f(
   internal: number,
   format: number,
@@ -144,8 +212,12 @@ export class GLTexture {
     let info = formatInfo(gl, desc.format);
     // Float render targets are an extension in WebGL2. Without it, fall back to
     // 8-bit so the effect still runs (with less precision) instead of failing.
-    if (info.float && desc.usage & TEX_RENDER_ATTACHMENT && !device.canRenderFloat) {
-      info = formatInfo(gl, 'rgba8unorm');
+    if (info.float && desc.usage & TEX_RENDER_ATTACHMENT) {
+      if (info.type === gl.FLOAT && !device.canRenderFloat) {
+        info = formatInfo(gl, device.canRenderHalf ? 'rgba16float' : 'rgba8unorm');
+      } else if (info.type === gl.HALF_FLOAT && !device.canRenderHalf) {
+        info = formatInfo(gl, 'rgba8unorm');
+      }
     }
     this.info = info;
     this.handle = gl.createTexture();
@@ -967,7 +1039,8 @@ export class GLDevice extends EventTarget {
   /** Marks this as the WebGL2 compatibility backend. */
   readonly isCompatDevice = true;
   /** @internal */ isLost = false;
-  /** @internal */ readonly canRenderFloat: boolean;
+  /** @internal 32-bit float textures can be rendered into. */ readonly canRenderFloat: boolean;
+  /** @internal 16-bit float textures can be rendered into. */ readonly canRenderHalf: boolean;
   /** @internal */ readonly canvas: OffscreenCanvas | HTMLCanvasElement;
 
   private resolveLost!: (info: GPUDeviceLostInfo) => void;
@@ -982,12 +1055,19 @@ export class GLDevice extends EventTarget {
     readonly gl: GL,
     canvas: OffscreenCanvas | HTMLCanvasElement,
     adapterInfo: GPUAdapterInfo,
+    caps: FloatTargetCaps,
   ) {
     super();
     this.canvas = canvas;
     this.adapterInfo = adapterInfo;
     this.queue = new GLQueue(this);
-    this.canRenderFloat = !!gl.getExtension('EXT_color_buffer_float');
+    gl.getExtension('EXT_color_buffer_float');
+    gl.getExtension('EXT_color_buffer_half_float');
+    this.canRenderFloat = caps.float32;
+    this.canRenderHalf = caps.float16;
+    console.info(
+      `[WebGL2-Compat] float render targets: 32-bit ${this.canRenderFloat ? 'yes' : 'no'}, 16-bit ${this.canRenderHalf ? 'yes' : 'no'}`,
+    );
     gl.getExtension('OES_texture_float_linear');
     gl.getExtension('EXT_float_blend');
     this.limits = {

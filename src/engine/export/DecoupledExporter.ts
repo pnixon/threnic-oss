@@ -28,6 +28,8 @@ import type { IExportRenderer, FrameState } from '../gpu/IExportRenderer';
 import { checkWebGPUSupport } from '../gpu/webgpu-support';
 import { ExportEffectsBridge } from './ExportEffectsBridge';
 import { StreamableExportController } from './StreamableExportController';
+import { RealtimeRecorderController } from './RealtimeRecorderController';
+import { recorderFps, type ExportEngine } from './exportEngine';
 import { AudioAnalyzer } from './AudioAnalyzer';
 import { VideoFrameExtractor } from './VideoFrameExtractor';
 import { audioStore } from '@/engine/stores/audioStore';
@@ -140,6 +142,12 @@ export interface DecoupledExportConfig {
 
   /** Whether to render the Threnic watermark on exported frames (opt-in) */
   watermark?: boolean;
+
+  /**
+   * Export engine. 'recorder' captures the render in real time with
+   * MediaRecorder for browsers without WebCodecs. Defaults to 'webcodecs'.
+   */
+  engine?: ExportEngine;
 }
 
 export interface ExportProgress {
@@ -230,7 +238,7 @@ export class DecoupledExporter {
   }
 
   private effectsBridge: ExportEffectsBridge | null = null;
-  private controller: StreamableExportController | null = null;
+  private controller: StreamableExportController | RealtimeRecorderController | null = null;
   private audioAnalyzer: AudioAnalyzer | null = null;
   private _butterchurnAudioCtx: AudioContext | null = null;
   /** Blob URLs minted for custom game-scene assets; revoked in _cleanup(). */
@@ -284,6 +292,10 @@ export class DecoupledExporter {
       ...config,
       width: Math.round(config.width / 2) * 2, // Ensure even
       height: Math.round(config.height / 2) * 2,
+      fps:
+        config.engine === 'recorder'
+          ? recorderFps(config.width, config.height, config.fps)
+          : config.fps,
     };
   }
 
@@ -760,18 +772,36 @@ export class DecoupledExporter {
 
       // ── 2. Init Encoder ──────────────────────────────────
       const hasAudio = !!this.config.audioBuffer;
-      this.controller = new StreamableExportController({
-        width,
-        height,
-        fps,
-        videoBitrate: this.config.videoBitrate,
-        audioSampleRate: this.config.audioBuffer?.sampleRate ?? 48000,
-        audioChannels: this.config.audioBuffer?.numberOfChannels ?? 2,
-        suggestedName: this.config.suggestedName,
-      });
+      const useRecorder = this.config.engine === 'recorder';
+      this.controller = useRecorder
+        ? new RealtimeRecorderController({
+            width,
+            height,
+            fps,
+            videoBitrate: this.config.videoBitrate,
+            suggestedName: this.config.suggestedName,
+            audioBuffer: this.config.audioBuffer,
+            audioStartSec: this.config.startTime ?? 0,
+            durationSec: duration,
+          })
+        : new StreamableExportController({
+            width,
+            height,
+            fps,
+            videoBitrate: this.config.videoBitrate,
+            audioSampleRate: this.config.audioBuffer?.sampleRate ?? 48000,
+            audioChannels: this.config.audioBuffer?.numberOfChannels ?? 2,
+            suggestedName: this.config.suggestedName,
+          });
 
       const encoderOk = await this.controller.start(hasAudio, writableStream);
-      if (!encoderOk) throw new Error('WebCodecs encoder initialization failed');
+      if (!encoderOk) {
+        throw new Error(
+          useRecorder
+            ? 'Could not start the real-time recorder'
+            : 'WebCodecs encoder initialization failed',
+        );
+      }
 
       // ── 3. Parse Keyframes ───────────────────────────────
       if (this.config.keyframes?.length) {
@@ -811,6 +841,18 @@ export class DecoupledExporter {
 
       for (let frame = 0; frame < totalFrames; frame++) {
         if (this._cancelled) break;
+
+        // Real-time capture: when rendering falls behind the clock, drop the
+        // frame so the picture keeps pace with the soundtrack.
+        if (
+          this.controller instanceof RealtimeRecorderController &&
+          this.controller.shouldSkip(frame, totalFrames - 1)
+        ) {
+          // Give the recorder's own events a turn; a loop of skips would
+          // otherwise never leave the current task.
+          await new Promise((r) => setTimeout(r, 0));
+          continue;
+        }
 
         const time = startTimeOffset + frame / fps;
         const timestampMicros = frame * frameDurationMicros;
@@ -1323,6 +1365,12 @@ export class DecoupledExporter {
       if (hasAudio && this.config.audioBuffer && this.controller.audioEncoder) {
         report(totalFrames, 'audio');
         await this._encodeAudio(this.config.audioBuffer, startTimeOffset, duration);
+      }
+
+      if (this.controller instanceof RealtimeRecorderController) {
+        console.info(
+          `[Export] Real-time capture: ${this.controller.skippedFrames} of ${totalFrames} frames skipped to keep pace with the audio`,
+        );
       }
 
       // ── 7. Finalize ──────────────────────────────────────

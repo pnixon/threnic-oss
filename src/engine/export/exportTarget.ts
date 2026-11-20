@@ -57,7 +57,7 @@ interface ExportTarget {
    *  than being held in RAM until close. */
   directToDisk: boolean;
   /** How the target was acquired — for accurate user messaging. */
-  sink: 'file-system-access' | 'opfs' | 'memory';
+  sink: 'file-system-access' | 'opfs' | 'memory' | 'recorder';
 }
 
 /** Aborted by the user at the Save dialog — callers should quietly return. */
@@ -205,7 +205,13 @@ async function makeOpfsStream(suggestedName: string, mimeType: string): Promise<
 export async function acquireExportTarget(
   suggestedName: string,
   mimeType = 'video/mp4',
+  engine: 'webcodecs' | 'recorder' = 'webcodecs',
 ): Promise<ExportTarget> {
+  // The real-time recorder produces and downloads its own file, so there is
+  // nothing to acquire (and no save dialog to ask for).
+  if (engine === 'recorder') {
+    return { writableStream: new WritableStream(), directToDisk: false, sink: 'recorder' };
+  }
   if (supportsFileSystemAccess()) {
     let handle: FileSystemFileHandle;
     try {

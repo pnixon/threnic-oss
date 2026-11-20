@@ -1,4 +1,5 @@
 import { repairAvcDescription } from './avcDescription';
+import { isPixelFrame, type ExportFrame } from './exportFrame';
 import { type CodecKey } from '@/types/export';
 import {
   negotiateVideoCodec,
@@ -413,7 +414,9 @@ export class StreamableExportController {
    * Encode a pre-created VideoFrame directly.
    * Applies backpressure if the encoder queue is full.
    */
-  async encodeVideoFrame(frame: VideoFrame): Promise<void> {
+  async encodeVideoFrame(input: ExportFrame): Promise<void> {
+    if (isPixelFrame(input)) throw new Error('Pixel frames need the real-time recorder');
+    const frame = input;
     const encoder = this.videoEncoder;
     if (!this.isRecording || !encoder || this.encoderError || encoder.state !== 'configured') {
       frame.close();

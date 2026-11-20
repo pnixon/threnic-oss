@@ -75,9 +75,23 @@ compatibility backend, so every effect, visualizer and lyric effect is still
 available. The badge in the header shows which one is active, and "Compatibility
 mode" in the Export tab forces WebGL2 if WebGPU misbehaves on your hardware.
 
-Export needs the browser's video encoder (WebCodecs). Chrome, Edge and desktop
-Firefox have one; Firefox for Android does not, so it can preview but not
-export.
+Export has two engines, chosen automatically:
+
+- **Offline (WebCodecs).** Faster than real time, MP4 output. Used in Chrome,
+  Edge, desktop Firefox and Safari 26 or later.
+- **Live recording (MediaRecorder).** Used where WebCodecs is missing or has no
+  audio encoder: Firefox for Android and Safari before 26 (older Macs). The
+  render is recorded as it plays, so it takes as long as the video, the tab must
+  stay open and in front, and the file is WebM (MP4 in Safari). Above 720p the
+  frame rate is capped at 24 fps, which live encoders keep up with.
+
+On older GPUs that cannot render into float textures (common on older Macs) the
+WebGL2 backend falls back to 16-bit or 8-bit targets and the picture stays the
+same apart from slightly coarser glow gradients.
+
+Safari itself has not been run through the test suite (WebKit needs system
+libraries this project's machines lack); its paths are covered by simulating the
+missing APIs in Chrome and Firefox.
 
 ## License
 

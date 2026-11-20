@@ -21,6 +21,7 @@
  *   - No RenderGraph support
  */
 
+import { makeExportFrame, type ExportFrame } from '@/engine/export/exportFrame';
 import type { IExportRenderer, FrameState, BgTransitionOpts } from './IExportRenderer';
 import type { RenderGraph } from './RenderGraph';
 
@@ -301,7 +302,7 @@ export class Canvas2DExportRenderer implements IExportRenderer {
     state: FrameState,
     timestampMicros: number,
     durationMicros: number,
-  ): Promise<VideoFrame> {
+  ): Promise<ExportFrame> {
     if (!this._initialized || !this.ctx) {
       throw new Error('Renderer not initialized');
     }
@@ -313,7 +314,7 @@ export class Canvas2DExportRenderer implements IExportRenderer {
     const h = this.canvas.height;
 
     // Nothing to draw into yet (canvas not sized by ResizeObserver)
-    if (w === 0 || h === 0) return null as unknown as VideoFrame;
+    if (w === 0 || h === 0) return null as unknown as ExportFrame;
 
     // Delta time
     const now = state.time;
@@ -404,15 +405,23 @@ export class Canvas2DExportRenderer implements IExportRenderer {
 
     if (this.canvas instanceof HTMLCanvasElement) {
       // In preview mode (HTMLCanvasElement), we don't return a VideoFrame
-      return null as unknown as VideoFrame;
+      return null as unknown as ExportFrame;
     }
 
-    const videoFrame = new VideoFrame(this.canvas, {
+    if (typeof VideoFrame === 'undefined') {
+      const px = ctx.getImageData(0, 0, w, h);
+      return makeExportFrame(
+        new Uint8Array(px.data.buffer, px.data.byteOffset, px.data.byteLength),
+        w,
+        h,
+        timestampMicros,
+        durationMicros,
+      );
+    }
+    return new VideoFrame(this.canvas, {
       timestamp: Math.round(timestampMicros),
       duration: Math.round(durationMicros),
     });
-
-    return videoFrame;
   }
 
   // -------------------------------------------------------------------

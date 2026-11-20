@@ -5,6 +5,7 @@
  * implement this contract so DecoupledExporter can use either transparently.
  */
 
+import type { ExportFrame } from '@/engine/export/exportFrame';
 import type { RenderGraph } from './RenderGraph';
 import type { TextureLoader } from './TextureLoader';
 
@@ -66,7 +67,7 @@ export interface IExportRenderer {
     state: FrameState,
     timestampMicros: number,
     durationMicros: number,
-  ): Promise<VideoFrame>;
+  ): Promise<ExportFrame>;
 
   /** Generate a snapshot blob for UI progress preview. */
   createSnapshotBlob(state?: FrameState): Promise<Blob | null>;
@@ -281,5 +282,5 @@ export interface IExportRenderer {
     bufferIndex: number,
     timestampMicros: number,
     durationMicros: number,
-  ): Promise<VideoFrame>;
+  ): Promise<ExportFrame>;
 }

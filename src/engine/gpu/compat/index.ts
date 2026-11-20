@@ -8,7 +8,7 @@
  * backend the support probe selected (see webgpu-support.ts).
  */
 
-import { GLCanvasContext, GLDevice } from './GLDevice';
+import { GLCanvasContext, GLDevice, probeFloatTargets, type FloatTargetCaps } from './GLDevice';
 import { loadWgslTranslator } from './wgslTranslator';
 
 export type GPUBackend = 'webgpu' | 'webgl2';
@@ -98,6 +98,7 @@ function createGL(): {
 
 interface CompatAdapterFacts {
   maxTextureSize: number;
+  floatTargets: FloatTargetCaps;
   renderer: string;
   vendor: string;
 }
@@ -115,6 +116,7 @@ function readAdapterFacts(): CompatAdapterFacts | null {
   const dbg = gl.getExtension('WEBGL_debug_renderer_info');
   adapterFacts = {
     maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) as number,
+    floatTargets: probeFloatTargets(gl),
     renderer: String(
       (dbg && gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) || gl.getParameter(gl.RENDERER) || '',
     ),
@@ -147,7 +149,10 @@ class GLAdapter {
     if (!made) {
       return Promise.reject(new Error('Could not create a WebGL2 context for the device.'));
     }
-    return Promise.resolve(new GLDevice(made.gl, made.canvas, this.info) as unknown as GPUDevice);
+    const caps = readAdapterFacts()?.floatTargets ?? { float32: false, float16: false };
+    return Promise.resolve(
+      new GLDevice(made.gl, made.canvas, this.info, caps) as unknown as GPUDevice,
+    );
   }
 }
 

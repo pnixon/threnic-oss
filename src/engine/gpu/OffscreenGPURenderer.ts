@@ -26,6 +26,7 @@
  *   - Falls back to seeked + extra delay when RVFC is unavailable
  */
 
+import { makeExportFrame, type ExportFrame } from '@/engine/export/exportFrame';
 import {
   TextureLoader,
   type LoadedTexture,
@@ -1647,7 +1648,7 @@ export class OffscreenGPURenderer implements IExportRenderer {
     state: FrameState,
     timestampMicros: number,
     durationMicros: number,
-  ): Promise<VideoFrame> {
+  ): Promise<ExportFrame> {
     if (!this._initialized) throw new Error('Renderer not initialized');
     this._frameCounter++;
     // Determine active buffer slot (double/triple buffering)
@@ -1923,13 +1924,13 @@ export class OffscreenGPURenderer implements IExportRenderer {
       frameData = stripped;
     }
 
-    const videoFrame = new VideoFrame(frameData, {
-      format: 'RGBA',
-      codedWidth: this.width,
-      codedHeight: this.height,
-      timestamp: Math.round(timestampMicros),
-      duration: Math.round(durationMicros),
-    });
+    const videoFrame = makeExportFrame(
+      frameData as Uint8Array,
+      this.width,
+      this.height,
+      timestampMicros,
+      durationMicros,
+    );
 
     // Cache stripped pixel data for zero-GPU snapshot generation (only every N frames).
     // Must copy (slice) since the fast-path frameData is a view into the mapped GPU buffer
@@ -2210,7 +2211,7 @@ export class OffscreenGPURenderer implements IExportRenderer {
     bufferIndex: number,
     timestampMicros: number,
     durationMicros: number,
-  ): Promise<VideoFrame> {
+  ): Promise<ExportFrame> {
     const buffer = this.readbackBuffers[bufferIndex];
     await buffer.mapAsync(GPUMapMode.READ);
 
@@ -2232,13 +2233,13 @@ export class OffscreenGPURenderer implements IExportRenderer {
       frameData = stripped;
     }
 
-    const videoFrame = new VideoFrame(frameData, {
-      format: 'RGBA',
-      codedWidth: this.width,
-      codedHeight: this.height,
-      timestamp: Math.round(timestampMicros),
-      duration: Math.round(durationMicros),
-    });
+    const videoFrame = makeExportFrame(
+      frameData as Uint8Array,
+      this.width,
+      this.height,
+      timestampMicros,
+      durationMicros,
+    );
 
     // Cache stripped pixel data for snapshots (infrequently).
     // Must copy since fast-path frameData is a view into the mapped GPU buffer.
